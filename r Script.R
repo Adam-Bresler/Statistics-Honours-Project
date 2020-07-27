@@ -96,6 +96,42 @@ colnames_match_scores <- c("tourney_year_id",
                            "match_id",
                            "match_stats_url_suffix")
 
+
+
+colnames_tourney_stats<-c("tourney_year_id",
+"tourney_order",
+"tourney_type",
+"tourney_name",
+"tourney_id",
+"tourney_slug",
+"tourney_location",
+"tourney_date",
+"year",
+"tourney_month",
+"tourney_day",
+"tourney_singles_draw",
+"tourney_doubles_draw",
+"tourney_conditions",
+"tourney_surface",
+"tourney_fin_commit_raw",
+"currency",
+"tourney_fin_commit",
+"tourney_url_suffix",
+"singles_winner_name",
+"singles_winner_url",
+"singles_winner_player_slug",
+"singles_winner_player_id",
+"doubles_winner_1_name",
+"doubles_winner_1_url",
+"doubles_winner_1_player_slug",
+"doubles_winner_1_player_id",
+"doubles_winner_2_name",
+"doubles_winner_2_url",
+"doubles_winner_2_player_slug",
+"doubles_winner_2_player_id")
+
+tourney_stats_2010_2019 <- read_csv("tournaments_2010-2019.csv", col_names = colnames_tourney_stats)
+
 match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = colnames_match_stats)
 match_stats_2018 <- read_csv("match_stats_2018.csv", col_names = colnames_match_stats)
 match_stats_2017 <- read_csv("match_stats_2017.csv", col_names = colnames_match_stats)
@@ -111,5 +147,6 @@ match_stats <- rbind(match_stats_2010, match_stats_2011, match_stats_2012,
                      match_stats_2013, match_stats_2014, match_stats_2015,
                      match_stats_2016, match_stats_2017, match_stats_2018,
                      match_stats_2019)
+
 
 match_scores <- read_csv("match_scores_2010-2019.csv", col_names = colnames_match_scores)
