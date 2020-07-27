@@ -97,3 +97,17 @@ colnames_match_scores <- c("tourney_year_id",
                            "match_stats_url_suffix")
 
 match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = colnames_match_stats)
+match_stats_2018 <- read_csv("match_stats_2018.csv", col_names = colnames_match_stats)
+match_stats_2017 <- read_csv("match_stats_2017.csv", col_names = colnames_match_stats)
+match_stats_2016 <- read_csv("match_stats_2016.csv", col_names = colnames_match_stats)
+match_stats_2015 <- read_csv("match_stats_2015.csv", col_names = colnames_match_stats)
+match_stats_2014 <- read_csv("match_stats_2014.csv", col_names = colnames_match_stats)
+match_stats_2013 <- read_csv("match_stats_2013.csv", col_names = colnames_match_stats)
+match_stats_2012 <- read_csv("match_stats_2012.csv", col_names = colnames_match_stats)
+match_stats_2011 <- read_csv("match_stats_2011.csv", col_names = colnames_match_stats)
+match_stats_2010 <- read_csv("match_stats_2010.csv", col_names = colnames_match_stats)
+
+match_stats <- rbind(match_stats_2010, match_stats_2011, match_stats_2012,
+                     match_stats_2013, match_stats_2014, match_stats_2015,
+                     match_stats_2016, match_stats_2017, match_stats_2018,
+                     match_stats_2019)
