@@ -1,5 +1,5 @@
 library(readr)
-colnames <- c("match_id",
+colnames_match_stats <- c("match_id",
                     "tourney_slug",
                     "match_stats_url_suffix",
                     "match_time",
@@ -59,7 +59,43 @@ colnames <- c("match_id",
                     "loser_total_points_won",
                     "loser_total_points_total")
 
-match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = colnames)
+colnames_match_scores <- c("tourney_year_id",
+                           "tourney_order",
+                           "tourney_name",
+                           "tourney_slug",
+                           "tourney_url_suffix",
+                           "start_date",
+                           "start_year",
+                           "start_month",
+                           "start_day",
+                           "end_date",
+                           "end_year",
+                           "end_month",
+                           "end_day",
+                           "currency",
+                           "prize_money",
+                           "match_index",
+                           "tourney_round_name",
+                           "round_order",
+                           "match_order",
+                           "winner_name",
+                           "winner_player_id",
+                           "winner_slug",
+                           "loser_name",
+                           "loser_player_id",
+                           "loser_slug",
+                           "winner_seed",
+                           "loser_seed",
+                           "match_score_tiebreaks",
+                           "winner_sets_won",
+                           "loser_sets_won",
+                           "winner_games_won",
+                           "loser_games_won",
+                           "winner_tiebreaks_won",
+                           "loser_tiebreaks_won",
+                           "match_id",
+                           "match_stats_url_suffix")
+
 
 
 colnames_tourney_stats<-c("tourney_year_id",
@@ -95,3 +131,20 @@ colnames_tourney_stats<-c("tourney_year_id",
 "doubles_winner_2_player_id")
 
 tourney_stats_2010_2019 <- read_csv("tournaments_2010-2019.csv", col_names = colnames_tourney_stats)
+
+match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = colnames_match_stats)
+match_stats_2018 <- read_csv("match_stats_2018.csv", col_names = colnames_match_stats)
+match_stats_2017 <- read_csv("match_stats_2017.csv", col_names = colnames_match_stats)
+match_stats_2016 <- read_csv("match_stats_2016.csv", col_names = colnames_match_stats)
+match_stats_2015 <- read_csv("match_stats_2015.csv", col_names = colnames_match_stats)
+match_stats_2014 <- read_csv("match_stats_2014.csv", col_names = colnames_match_stats)
+match_stats_2013 <- read_csv("match_stats_2013.csv", col_names = colnames_match_stats)
+match_stats_2012 <- read_csv("match_stats_2012.csv", col_names = colnames_match_stats)
+match_stats_2011 <- read_csv("match_stats_2011.csv", col_names = colnames_match_stats)
+match_stats_2010 <- read_csv("match_stats_2010.csv", col_names = colnames_match_stats)
+
+match_stats <- rbind(match_stats_2010, match_stats_2011, match_stats_2012,
+                     match_stats_2013, match_stats_2014, match_stats_2015,
+                     match_stats_2016, match_stats_2017, match_stats_2018,
+                     match_stats_2019)
+
