@@ -61,7 +61,37 @@ colnames <- c("match_id",
 
 match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = colnames)
 
-# This is a test 
-# The test worked
 
-# Test 2
+colnames_tourney_stats<-c("tourney_year_id",
+"tourney_order",
+"tourney_type",
+"tourney_name",
+"tourney_id",
+"tourney_slug",
+"tourney_location",
+"tourney_date",
+"year",
+"tourney_month",
+"tourney_day",
+"tourney_singles_draw",
+"tourney_doubles_draw",
+"tourney_conditions",
+"tourney_surface",
+"tourney_fin_commit_raw",
+"currency",
+"tourney_fin_commit",
+"tourney_url_suffix",
+"singles_winner_name",
+"singles_winner_url",
+"singles_winner_player_slug",
+"singles_winner_player_id",
+"doubles_winner_1_name",
+"doubles_winner_1_url",
+"doubles_winner_1_player_slug",
+"doubles_winner_1_player_id",
+"doubles_winner_2_name",
+"doubles_winner_2_url",
+"doubles_winner_2_player_slug",
+"doubles_winner_2_player_id")
+
+tourney_stats_2010_2019 <- read_csv("tournaments_2010-2019.csv", col_names = colnames_tourney_stats)
