@@ -59,4 +59,5 @@ colnames <- c("match_id",
                     "loser_total_points_won",
                     "loser_total_points_total")
 
-match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = colnames)
+match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = FALSE)
+mean(match_stats_2019$winner_aces)
