@@ -111,3 +111,5 @@ match_stats <- rbind(match_stats_2010, match_stats_2011, match_stats_2012,
                      match_stats_2013, match_stats_2014, match_stats_2015,
                      match_stats_2016, match_stats_2017, match_stats_2018,
                      match_stats_2019)
+
+match_scores <- read_csv("match_scores_2010-2019.csv", col_names = colnames_match_scores)
