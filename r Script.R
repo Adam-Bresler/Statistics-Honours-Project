@@ -1,5 +1,5 @@
 library(readr)
-colnames <- c("match_id",
+colnames_match_stats <- c("match_id",
                     "tourney_slug",
                     "match_stats_url_suffix",
                     "match_time",
@@ -59,9 +59,41 @@ colnames <- c("match_id",
                     "loser_total_points_won",
                     "loser_total_points_total")
 
-match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = colnames)
+colnames_match_scores <- c("tourney_year_id",
+                           "tourney_order",
+                           "tourney_name",
+                           "tourney_slug",
+                           "tourney_url_suffix",
+                           "start_date",
+                           "start_year",
+                           "start_month",
+                           "start_day",
+                           "end_date",
+                           "end_year",
+                           "end_month",
+                           "end_day",
+                           "currency",
+                           "prize_money",
+                           "match_index",
+                           "tourney_round_name",
+                           "round_order",
+                           "match_order",
+                           "winner_name",
+                           "winner_player_id",
+                           "winner_slug",
+                           "loser_name",
+                           "loser_player_id",
+                           "loser_slug",
+                           "winner_seed",
+                           "loser_seed",
+                           "match_score_tiebreaks",
+                           "winner_sets_won",
+                           "loser_sets_won",
+                           "winner_games_won",
+                           "loser_games_won",
+                           "winner_tiebreaks_won",
+                           "loser_tiebreaks_won",
+                           "match_id",
+                           "match_stats_url_suffix")
 
-# This is a test 
-# The test worked
-
-# Test 2
+match_stats_2019 <- read_csv("match_stats_2019.csv", col_names = colnames_match_stats)
