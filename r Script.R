@@ -152,6 +152,10 @@ match_scores <- read_csv("match_scores_2010-2019.csv", col_names = colnames_matc
 # Combine --------------------------------------------------------------------
 match <- merge(match_stats, match_scores, by = "match_stats_url_suffix")
 
+# Get rid of columns ---------------------------------------------------------
+colnames(match)
+rid <- c("match_stats_url_suffix", "match_time", "winner_slug.x", "loser_slug.x", "tourney_order")
+
 # Randomly Assign ------------------------------------------------------------
-players <- match_stats[, c()]
+
 
