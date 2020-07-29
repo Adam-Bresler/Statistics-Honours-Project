@@ -150,9 +150,7 @@ match_stats <- rbind(match_stats_2010, match_stats_2011, match_stats_2012,
 match_scores <- read_csv("match_scores_2010-2019.csv", col_names = colnames_match_scores)
 
 # Combine --------------------------------------------------------------------
-match_stats$match_index <- substr(match_stats$match_id, 10,14)  
-
-
+match <- merge(match_stats, match_scores, by = "match_stats_url_suffix")
 
 # Randomly Assign ------------------------------------------------------------
 players <- match_stats[, c()]
