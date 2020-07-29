@@ -190,47 +190,97 @@ head(match$player2)
 
 colnames(match)
 
-# Build player data base -----------------------------------------------------
-library (rvest)
-library(dplyr)
-library(stringr)
-
-url_base_1 <- 'https://www.atptour.com/en/players/'
-url_end <- 'overview'
-
-for(i in 1:nrow(players)){
-  
-}
-
-
-
-
-
-# player names ---------------------------------------------------------------
+# Player names ---------------------------------------------------------------
 players<-as.vector(unique(c(unique(match$winner_name),
-         unique(match$loser_name))))
+                            unique(match$loser_name))))
 
-players[1]
-players[2]
-players[200]
-
-id<-numeric()
-slug<-numeric()
+id <- numeric()
+slug <- numeric()
 
 for (i in 1:length(players)){
-id[i]=match_scores[which(match_scores$winner_name==players[i])[1],"winner_player_id"]
-slug[i]=match_scores[which(match_scores$winner_name==players[i])[1],"winner_slug"]
-
+  id[i] <- match_scores[which(match_scores$winner_name==players[i])[1],"winner_player_id"]
+  slug[i] <- match_scores[which(match_scores$winner_name==players[i])[1],"winner_slug"]
 }
 
 for (i in which(is.na(id))){
-  id[i]=match_scores[which(match_scores$loser_name==players[i])[1],"loser_player_id"]
-  slug[i]=match_scores[which(match_scores$loser_name==players[i])[1],"loser_slug"]
+  id[i] <- match_scores[which(match_scores$loser_name==players[i])[1],"loser_player_id"]
+  slug[i] <- match_scores[which(match_scores$loser_name==players[i])[1],"loser_slug"]
 }
 
 
-players<-as.data.frame(cbind(players,id,slug))
+# Build player data base -----------------------------------------------------
 
+# While this of course works, it is incredibly slow. Use the csv instead, 
+# is the output of this code anyway
 
+# library (rvest)
+# library(dplyr)
+# library(stringr)
+# library(httr)
+# 
+# url_base_1 <- 'https://www.atptour.com/en/players'
+# url_end <- 'overview'
+# 
+# for(i in 1:nrow(players)){
+#   id <- players$id[i]
+#   slug <- players$slug[i]
+#   
+#   url <- paste(url_base_1, slug, sep = "/")
+#   url <- paste(url, id, sep = "/")
+#   url <- paste(url, url_end, sep = "/")
+#   
+#   players$url[i] <- url
+#   
+#   if(!http_error(url)) {
+#   webpage <- read_html(url)
+#   
+#   player_data1 <- html_nodes(webpage,'.table-big-value')
+#   player_data2 <- html_nodes(webpage,'.table-value')
+#   
+#   rank_data1 <- html_text(player_data1)
+#   rank_data2 <- html_text(player_data2)
+#   
+#   rank_data1 <- gsub(" ", "", rank_data1)
+#   rank_data1 <- gsub("\r", "", rank_data1)
+#   rank_data1 <- gsub("\n", "", rank_data1)
+#   
+#   rank_data2 <- gsub(" ", "", rank_data2)
+#   rank_data2 <- gsub("\r", "", rank_data2)
+#   rank_data2 <- gsub("\n", "", rank_data2)
+#   
+#   players$DOB[i] <- rank_data1[1]
+#   players$year_pro[i] <- rank_data1[2]
+#   players$weight[i] <- rank_data1[3]
+#   players$height[i] <- rank_data1[4]
+#   
+#   players$place_OB[i] <- rank_data2[1]
+#   players$residence[i] <- rank_data2[2]
+#   players$plays[i] <- rank_data2[3]
+#   players$coach[i] <- rank_data2[4]
+#   }
+#   
+#   else{
+#     players$DOB[i] <- NA
+#     players$year_pro[i] <- NA
+#     players$weight[i] <- NA
+#     players$height[i] <- NA
+#     
+#     players$place_OB[i] <- NA
+#     players$residence[i] <- NA
+#     players$plays[i] <- NA
+#     players$coach[i] <- NA
+#   }
+#   
+# 
+# }
+# 
+# players$slug <- unlist(players$slug)
+# players$id <- unlist(players$id)
+# players$players <- unlist(players$players)
+# str(players)
+# 
+# write.csv(players, file = "C:/Users/Adam Bresler/Documents/2020/Honours/Project/Data/csv/Working/players.csv")
 
-
+# Read in players data -------------------------------------------------------
+players <- read.csv("players.csv")
+players <- players[,-1]
