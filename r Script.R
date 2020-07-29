@@ -200,7 +200,6 @@ url_end <- 'overview'
 
 for(i in 1:nrow(players)){
   
-  url <- 
 }
 
 
@@ -219,7 +218,9 @@ id<-numeric()
 
 for (i in 1:length(players)){
 id[i]=match_scores[which(match_scores$winner_name==players[i])[1],21]
+
 }
+
 
 
 
