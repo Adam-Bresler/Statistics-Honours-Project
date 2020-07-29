@@ -96,8 +96,6 @@ colnames_match_scores <- c("tourney_year_id",
                            "match_id",
                            "match_stats_url_suffix")
 
-
-
 colnames_tourney_stats<-c("tourney_year_id",
 "tourney_order",
 "tourney_type",
@@ -148,5 +146,7 @@ match_stats <- rbind(match_stats_2010, match_stats_2011, match_stats_2012,
                      match_stats_2016, match_stats_2017, match_stats_2018,
                      match_stats_2019)
 
-
 match_scores <- read_csv("match_scores_2010-2019.csv", col_names = colnames_match_scores)
+
+
+
