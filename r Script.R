@@ -156,10 +156,14 @@ match <- merge(match_stats, match_scores, by = "match_stats_url_suffix")
 colnames(match)
 rid <- c("match_stats_url_suffix", "match_time", "winner_slug.x", "loser_slug.x", "tourney_order", "tourney_name", "tourney_slug.y",  "tourney_url_suffix", 
         "start_year", "start_month", "start_day", "end_year", "end_month", "end_day", "currency", "prize_money", "winner_player_id", "winner_slug.y", 
-        "loser_player_id", "loser_slug.y", "match_id.y" )
+        "loser_player_id", "loser_slug.y", "match_id.y")
 
 match_clean <- match[, -which(names(match) %in% rid)]
 
 # Randomly Assign ------------------------------------------------------------
+u <- runif(0,1)
 
+for(i in 1:length){
+  
+}
 
