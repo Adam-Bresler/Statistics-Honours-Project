@@ -207,4 +207,22 @@ for(i in 1:nrow(players)){
 
 
 
+# player names ---------------------------------------------------------------
+players<-as.vector(unique(c(unique(match$winner_name),
+         unique(match$loser_name))))
+
+players[1]
+players[2]
+players[200]
+
+id<-numeric()
+
+for (i in 1:length(players)){
+id[i]=match_scores[which(match_scores$winner_name==players[i])[1],21]
+}
+
+
+
+
+
 
