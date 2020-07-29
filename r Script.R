@@ -215,14 +215,21 @@ players[2]
 players[200]
 
 id<-numeric()
+slug<-numeric()
 
 for (i in 1:length(players)){
-id[i]=match_scores[which(match_scores$winner_name==players[i])[1],21]
+id[i]=match_scores[which(match_scores$winner_name==players[i])[1],"winner_player_id"]
+slug[i]=match_scores[which(match_scores$winner_name==players[i])[1],"winner_slug"]
 
 }
 
+for (i in which(is.na(id))){
+  id[i]=match_scores[which(match_scores$loser_name==players[i])[1],"loser_player_id"]
+  slug[i]=match_scores[which(match_scores$loser_name==players[i])[1],"loser_slug"]
+}
 
 
+players<-as.data.frame(cbind(players,id,slug))
 
 
 
