@@ -152,18 +152,36 @@ match_scores <- read_csv("match_scores_2010-2019.csv", col_names = colnames_matc
 # Combine --------------------------------------------------------------------
 match <- merge(match_stats, match_scores, by = "match_stats_url_suffix")
 
+# Remove Qualifying ----------------------------------------------------------
+match <- match[-which(grepl("Qualifying", match$tourney_round_name)), ]
+
 # Get rid of columns ---------------------------------------------------------
 colnames(match)
 rid <- c("match_stats_url_suffix", "match_time", "winner_slug.x", "loser_slug.x", "tourney_order", "tourney_name", "tourney_slug.y",  "tourney_url_suffix", 
         "start_year", "start_month", "start_day", "end_year", "end_month", "end_day", "currency", "prize_money", "winner_player_id", "winner_slug.y", 
         "loser_player_id", "loser_slug.y", "match_id.y")
 
-match_clean <- match[, -which(names(match) %in% rid)]
+match <- match[, -which(names(match) %in% rid)]
 
 # Randomly Assign ------------------------------------------------------------
-u <- runif(0,1)
-
-for(i in 1:length){
+for(i in 1:nrow(match)){
+  
+  u <- runif(1, 0, 1)
+  
+  if(u < 0.5){
+    match$player1[i] <- "winner"
+    match$player2[i] <- "loser"
+  }
+  
+  else{
+    match$player1[i] <- "loser"
+    match$player2[i] <- "winner"
+  }
   
 }
+
+head(match$player1)
+head(match$player2)
+
+
 
