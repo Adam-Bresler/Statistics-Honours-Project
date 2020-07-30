@@ -191,21 +191,22 @@ head(match$player2)
 colnames(match)
 
 # Player names ---------------------------------------------------------------
-players<-as.vector(unique(c(unique(match$winner_name),
-                            unique(match$loser_name))))
-
-id <- numeric()
-slug <- numeric()
-
-for (i in 1:length(players)){
-  id[i] <- match_scores[which(match_scores$winner_name==players[i])[1],"winner_player_id"]
-  slug[i] <- match_scores[which(match_scores$winner_name==players[i])[1],"winner_slug"]
-}
-
-for (i in which(is.na(id))){
-  id[i] <- match_scores[which(match_scores$loser_name==players[i])[1],"loser_player_id"]
-  slug[i] <- match_scores[which(match_scores$loser_name==players[i])[1],"loser_slug"]
-}
+# players<-as.vector(unique(c(unique(match$winner_name),
+#                             unique(match$loser_name))))
+# 
+# id <- numeric()
+# slug <- numeric()
+# 
+# for (i in 1:length(players)){
+#   id[i] <- match_scores[which(match_scores$winner_name==players[i])[1],"winner_player_id"]
+#   slug[i] <- match_scores[which(match_scores$winner_name==players[i])[1],"winner_slug"]
+# }
+# 
+# for (i in which(is.na(id))){
+#   id[i] <- match_scores[which(match_scores$loser_name==players[i])[1],"loser_player_id"]
+#   slug[i] <- match_scores[which(match_scores$loser_name==players[i])[1],"loser_slug"]
+# }
+# 
 
 
 # Build player data base -----------------------------------------------------
@@ -306,6 +307,17 @@ for(i in 1:nrow(players)){
 
 players <- players[,-9]
 
+# Find match order -----------------------------------------------------------
 
+match$start_date <- lubridate::ymd(match$start_date)
+match$match_order <- substr(match$match_index, 3, 5)
 
+last_game <- function(player, n){
+  
+  
+  
+  
+  
+  
+}
 
