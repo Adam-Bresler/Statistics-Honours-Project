@@ -313,9 +313,46 @@ match$start_date <- lubridate::ymd(match$start_date)
 match$match_order <- substr(match$match_index, 3, 5)
 match$match_order <- as.numeric(match$match_order)
 
+match <- match[order(match$start_date, decreasing = TRUE),]
+
+# Get a players last n games -------------------------------------------------
+
 last_game <- function(player, n){
   
+  ind <- which(match$winner_name == player | match$loser_name == player)
+  ind <- ind[1:n]
+  
+  match_n <- match[ind, ]
+  
+  data <- matrix(0, nrow = n, ncol = 33)
   
   
+  winner <- grep("winner", colnames(match))
+  loser <- grep("loser", colnames(match))
+  
+  colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl")
+  
+  for (i in 1:n) {
+
+    if(match_n$winner_name[i] == player){
+      data[i,1:32] <- t(as.vector(match_n[i, c(3, winner)]))
+      data[i, 33] <- 'winner'
+    }
+    
+    else{
+      data[i,1:32] <- t(as.vector(match_n[i, c(3, loser)]))
+      data[i, 33] <- 'loser'
+    }
+  }
+  
+  data <- as.data.frame(data)
+  cols <- c(1:27, 29:32)
+  data[, cols] <- sapply(data[, cols], as.numeric)  
+  return(data)
 }
+
+t <- last_game("Roger Federer", 5)
+
+
+
 
