@@ -281,6 +281,31 @@ for (i in which(is.na(id))){
 # 
 # write.csv(players, file = "C:/Users/Adam Bresler/Documents/2020/Honours/Project/Data/csv/Working/players.csv")
 
-# Read in players data -------------------------------------------------------
+# Read in and clean players data ---------------------------------------------
 players <- read.csv("players.csv")
-players <- players[,-1]
+players <- players[,-c(1, 10, 11, 13)]
+
+players$weight <- str_extract(players$weight, "\\([^()]+\\)")
+players$weight <- substr(players$weight, 2,nchar(players$weight)-3)
+
+players$height <- str_extract(players$height, "\\([^()]+\\)")
+players$height <- substr(players$height, 2,nchar(players$height)-3)
+
+players$DOB <- str_extract(players$DOB, "\\([^()]+\\)")
+players$DOB <- substr(players$DOB, 2,nchar(players$DOB)-1)
+players$DOB <- lubridate::ymd(players$DOB)
+
+for(i in 1:nrow(players)){
+  
+  temp <- players$plays[i]
+  split <- unlist(strsplit(temp, ","))
+  
+  players$hand[i] <- split[1]
+  players$back[i] <- split[2]
+}
+
+players <- players[,-9]
+
+
+
+
