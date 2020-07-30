@@ -311,11 +311,9 @@ players <- players[,-9]
 
 match$start_date <- lubridate::ymd(match$start_date)
 match$match_order <- substr(match$match_index, 3, 5)
+match$match_order <- as.numeric(match$match_order)
 
 last_game <- function(player, n){
-  
-  
-  
   
   
   
