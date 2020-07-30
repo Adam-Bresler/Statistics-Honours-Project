@@ -353,6 +353,55 @@ last_game <- function(player, n){
 
 t <- last_game("Roger Federer", 5)
 
+# All previous games between any 2 players -----------------------------------
+library(installr)
+
+past_matches <- function(player1, player2){
+  ind <- which(match$winner_name == player1 & match$loser_name == player2 | match$winner_name == player2 & match$loser_name == player1)
+  
+  if(is.empty(ind)){
+    return("Players have never met.")
+  }
+  
+  else{
+  match_past <- match[ind, ]
+  
+  return(match_past)
+  }
+  
+}
+player2 <- "Emilio Nava"
+
+past_matches("Roger Federer", "Emilio Nava")
+
+# Similar past matches -------------------------------------------------------
+
+similar_matches <- function(player, hand){
+  
+  if(match$winner_name == player){
+    ind <- which(match$winner_name == player)
+    
+    
+  }
+  
+  else{
+    ind <- which(match$loser_name == player)
+    
+    
+  }
+  
+  
+  
+  
+  return(match_past)
+}
+
+
+
+
+
+
+
 
 
 
