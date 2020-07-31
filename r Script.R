@@ -360,7 +360,7 @@ past_matches <- function(player1, player2){
   ind <- which(match$winner_name == player1 & match$loser_name == player2 | match$winner_name == player2 & match$loser_name == player1)
   
   if(is.empty(ind)){
-    return("Players have never met.")
+    return("Players have never met.") # Replace with similar matches?
   }
   
   else{
@@ -378,25 +378,70 @@ past_matches("Roger Federer", "Emilio Nava")
 
 similar_matches <- function(player, hand){
   
-  if(match$winner_name == player){
-    ind <- which(match$winner_name == player)
+ind <- which(match$winner_name == player | match$loser_name == player)
+player_games <- match[ind, ]
+
+ind_2 <- numeric()
+j <- 1
+ 
+for(i in 1:length(ind))  {
+  
+  if(match$winner_name[ind[i]] == player){
+    opponent <- player_games$loser_name[i]
+    opp_hand <- players[which(players$players == opponent),]$hand
+    
+    if(opp_hand == hand){
+      ind_2[j] <- i
+      j = j +1
+    }
     
     
   }
   
   else{
-    ind <- which(match$loser_name == player)
+    opponent <- player_games$winner_name[i]
+    opp_hand <- players[which(players$players == opponent),]$hand
+    
+    if(opp_hand == hand){
+      ind_2[j] <- i
+      j = j +1
+    }
     
     
   }
+}  
+
+
+data <- matrix(0, nrow = length(ind_2), ncol = 33)
+
+
+winner <- grep("winner", colnames(match))
+loser <- grep("loser", colnames(match))
+
+colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl")
+
+for (i in 1:length(ind_2)) {
   
+  if(player_games$winner_name[ind_2[i]] == player){
+    data[i,1:32] <- t(as.vector(player_games[ind_2[i], c(3, winner)]))
+    data[i, 33] <- 'winner'
+  }
   
-  
-  
-  return(match_past)
+  else{
+    data[i,1:32] <- t(as.vector(player_games[ind_2[i], c(3, loser)]))
+    data[i, 33] <- 'loser'
+  }
 }
 
+data <- as.data.frame(data)
+cols <- c(1:27, 29:32)
+data[, cols] <- sapply(data[, cols], as.numeric)  
 
+  
+  return(data)
+}
+
+similar_matches("Roger Federer", "Left-Handed")
 
 
 
