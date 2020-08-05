@@ -335,13 +335,13 @@ last_game <- function(player, n = NA){
   
   match_n <- match[ind, ]
   
-  data <- matrix(0, nrow = n, ncol = 33)
+  data <- matrix(0, nrow = n, ncol = 35)
   
   
   winner <- grep("winner", colnames(match))
   loser <- grep("loser", colnames(match))
   
-  colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl")
+  colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl", "tourney_id", "Match_order")
   
   
   
@@ -350,11 +350,15 @@ last_game <- function(player, n = NA){
     if(match_n$winner_name[i] == player){
       data[i,1:32] <- t(as.vector(match_n[i, c(3, winner)]))
       data[i, 33] <- 'winner'
+      data[i, 34] <- match_n[i, 56]
+      data[i, 35] <- match_n[i, 62]
     }
     
     else{
       data[i,1:32] <- t(as.vector(match_n[i, c(3, loser)]))
       data[i, 33] <- 'loser'
+      data[i, 34] <- match_n[i, 56]
+      data[i, 35] <- match_n[i, 62]
     }
   }
   
@@ -454,13 +458,22 @@ data[, cols] <- sapply(data[, cols], as.numeric)
   return(data)
 }
 
+#Begin final data frame ------------------------------------------------------
 
-final_data <- as.data.frame(matrix(0, nrow = 1, ncol = 33))
+# final_data <- as.data.frame(matrix(0, nrow = 1, ncol = 35))
+# colnames(final_data) <- colnames(last_game("Roger Federer"))
+# 
+# for(i in 1:length(players$players)){
+#   work <- last_game(players$players[i])
+#   final_data <- rbind(final_data, work)
+# }
+# final_data <- final_data[, c(28, 33, 1:27, 29:32, 34:35)]
+# final_data <- final_data[-1, ]
+# write.csv(final_data, file = "C:/Users/Adam Bresler/Documents/2020/Honours/Project/Data/Working/finaldata.csv")
 
-for(i in 1:length(players$players)){
-  work <- last_game(players$players[i])
-  final_data <- rbind(final_data, work)
-}
+final_data <- read.csv("finaldata.csv", header = TRUE)
+final_data <- final_data[, -1]
+
 
 
 
