@@ -283,6 +283,8 @@ colnames(match)
 # write.csv(players, file = "C:/Users/Adam Bresler/Documents/2020/Honours/Project/Data/csv/Working/players.csv")
 
 # Read in and clean players data ---------------------------------------------
+library(stringr)
+
 players <- read.csv("players.csv")
 players <- players[,-c(1, 10, 11, 13)]
 
@@ -317,9 +319,18 @@ match <- match[order(match$start_date, decreasing = TRUE),]
 
 # Get a players last n games -------------------------------------------------
 
-last_game <- function(player, n){
+last_game <- function(player, n = NA){
   
   ind <- which(match$winner_name == player | match$loser_name == player)
+  
+  if(is.na(n)){
+    n = length(ind)
+  }
+  
+  else{
+    n = n
+  }
+  
   ind <- ind[1:n]
   
   match_n <- match[ind, ]
@@ -331,6 +342,8 @@ last_game <- function(player, n){
   loser <- grep("loser", colnames(match))
   
   colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl")
+  
+  
   
   for (i in 1:n) {
 
@@ -351,7 +364,7 @@ last_game <- function(player, n){
   return(data)
 }
 
-t <- last_game("Roger Federer", 5)
+t <- last_game("Roger Federer")
 
 # All previous games between any 2 players -----------------------------------
 library(installr)
@@ -441,7 +454,13 @@ data[, cols] <- sapply(data[, cols], as.numeric)
   return(data)
 }
 
-similar_matches("Roger Federer", "Left-Handed")
+
+final_data <- as.data.frame(matrix(0, nrow = 1, ncol = 33))
+
+for(i in 1:length(players$players)){
+  work <- last_game(players$players[i])
+  final_data <- rbind(final_data, work)
+}
 
 
 
