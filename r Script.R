@@ -475,6 +475,27 @@ final_data <- read.csv("finaldata.csv", header = TRUE)
 final_data <- final_data[, -1]
 
 
+# adding tournament data -----------------------------------------------------
+
+
+# for (i in 1:nrow(final_data)){
+# final_data$tournament_name[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_name"]
+# final_data$tournament_date[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_date"]
+# final_data$tournament_type[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_type"]
+# final_data$tournament_conditions[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_conditions"]
+# final_data$tournament_surface[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_surface"]
+# }
+# 
+# final_data$tournament_name<-unlist(final_data$tournament_name)
+# final_data$tournament_date<-unlist(final_data$tournament_date)
+# final_data$tournament_type<-unlist(final_data$tournament_type)
+# final_data$tournament_conditions<-unlist(final_data$tournament_conditions)
+# final_data$tournament_surface<-unlist(final_data$tournament_surface)
+# 
+# write.csv(final_data, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/finaldata.csv")
+
+
+
 
 
 
