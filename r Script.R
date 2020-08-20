@@ -335,13 +335,13 @@ last_game <- function(player, n = NA){
   
   match_n <- match[ind, ]
   
-  data <- matrix(0, nrow = n, ncol = 35)
+  data <- matrix(0, nrow = n, ncol = 37)
   
   
   winner <- grep("winner", colnames(match))
   loser <- grep("loser", colnames(match))
   
-  colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl", "tourney_id", "Match_order")
+  colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl", "tourney_id", "Match_order", "Opponent", "Match_ID")
   
   
   
@@ -352,6 +352,8 @@ last_game <- function(player, n = NA){
       data[i, 33] <- 'winner'
       data[i, 34] <- match_n[i, 56]
       data[i, 35] <- match_n[i, 62]
+      data[i, 36] <- match_n[i, 64]
+      data[i, 37] <- match_n[i, 1]
     }
     
     else{
@@ -359,6 +361,8 @@ last_game <- function(player, n = NA){
       data[i, 33] <- 'loser'
       data[i, 34] <- match_n[i, 56]
       data[i, 35] <- match_n[i, 62]
+      data[i, 36] <- match_n[i, 63]
+      data[i, 37] <- match_n[i, 1]
     }
   }
   
@@ -460,46 +464,149 @@ data[, cols] <- sapply(data[, cols], as.numeric)
 
 #Begin final data frame ------------------------------------------------------
 
-# final_data <- as.data.frame(matrix(0, nrow = 1, ncol = 35))
+# final_data <- as.data.frame(matrix(0, nrow = 1, ncol = 37))
 # colnames(final_data) <- colnames(last_game("Roger Federer"))
 # 
 # for(i in 1:length(players$players)){
 #   work <- last_game(players$players[i])
 #   final_data <- rbind(final_data, work)
 # }
-# final_data <- final_data[, c(28, 33, 1:27, 29:32, 34:35)]
+# final_data <- final_data[, c(37, 28, 36, 33, 1:27, 29:32, 34:35)]
 # final_data <- final_data[-1, ]
 # write.csv(final_data, file = "C:/Users/Adam Bresler/Documents/2020/Honours/Project/Data/Working/finaldata.csv")
-
-final_data <- read.csv("finaldata.csv", header = TRUE)
-final_data <- final_data[, -1]
-
 
 # adding tournament data -----------------------------------------------------
 
 
-# for (i in 1:nrow(final_data)){
-# final_data$tournament_name[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_name"]
-# final_data$tournament_date[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_date"]
-# final_data$tournament_type[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_type"]
-# final_data$tournament_conditions[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_conditions"]
-# final_data$tournament_surface[i]<-tourney_stats_2010_2019[which(final_data$tourney_id[i]==tourney_stats_2010_2019$tourney_year_id),"tourney_surface"]
+for (i in 1:nrow(final_data)) {
+  final_data$tournament_name[i] <-
+    tourney_stats_2010_2019[which(final_data$tourney_id[i] == tourney_stats_2010_2019$tourney_year_id), "tourney_name"]
+  final_data$tournament_date[i] <-
+    tourney_stats_2010_2019[which(final_data$tourney_id[i] == tourney_stats_2010_2019$tourney_year_id), "tourney_date"]
+  final_data$tournament_type[i] <-
+    tourney_stats_2010_2019[which(final_data$tourney_id[i] == tourney_stats_2010_2019$tourney_year_id), "tourney_type"]
+  final_data$tournament_conditions[i] <-
+    tourney_stats_2010_2019[which(final_data$tourney_id[i] == tourney_stats_2010_2019$tourney_year_id), "tourney_conditions"]
+  final_data$tournament_surface[i] <-
+    tourney_stats_2010_2019[which(final_data$tourney_id[i] == tourney_stats_2010_2019$tourney_year_id), "tourney_surface"]
+}
+
+final_data$tournament_name <- unlist(final_data$tournament_name)
+final_data$tournament_date <- unlist(final_data$tournament_date)
+final_data$tournament_type <- unlist(final_data$tournament_type)
+final_data$tournament_conditions <-
+  unlist(final_data$tournament_conditions)
+final_data$tournament_surface <- unlist(final_data$tournament_surface)
+
+#write.csv(final_data, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/finaldata.csv")
+
+# Summing all previous data --------------------------------------------------
+# library(stringr)
+# 
+# for(i in 41:72){
+#   final_data[,i] <- NA
+# }
+# #38 before
+# name_last <- "NULL"
+# 
+# for(i in 1:nrow(final_data)){
+# 
+#   if(name_last == final_data$name[i]){
+#     final_data[i, 72] <- final_data[i - 1, 72] + 1
+#     final_data[i, 41:71] <- (final_data[i-1, 41:71]*final_data[i - 1, 72] + final_data[i, 3:33])/final_data[i, 72]
+#   }
+# 
+#   else{
+#     final_data[i, 41:71] <- final_data[i, 3:33]
+#     final_data[i, 72] <- 1
+#   }
+# 
+#   name_last <- final_data$name[i]
 # }
 # 
-# final_data$tournament_name<-unlist(final_data$tournament_name)
-# final_data$tournament_date<-unlist(final_data$tournament_date)
-# final_data$tournament_type<-unlist(final_data$tournament_type)
-# final_data$tournament_conditions<-unlist(final_data$tournament_conditions)
-# final_data$tournament_surface<-unlist(final_data$tournament_surface)
+# names <- c(paste("average", colnames(final_data[3:33]), sep="_"), "num_games")
 # 
-# write.csv(final_data, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/finaldata.csv")
+# for (i in 41:72) {
+#   colnames(final_data)[i] <- names[i-40]
+# }
+# 
+# write.csv(final_data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/finaldata.csv")
 
 
+# X number average -----------------------------------------------------------
 
+# last_game <- function(player, n = NA){
+#   
+#   ind <- which(match$winner_name == player | match$loser_name == player)
+#   
+#   if(is.na(n)){
+#     n = length(ind)
+#   }
+#   
+#   else{
+#     n = n
+#   }
+#   
+#   ind <- ind[1:n]
+#   
+#   match_n <- match[ind, ]
+#   
+#   data <- matrix(0, nrow = n, ncol = 35)
+#   
+#   
+#   winner <- grep("winner", colnames(match))
+#   loser <- grep("loser", colnames(match))
+#   
+#   colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl", "tourney_id", "Match_order")
+#   
+#   
+#   
+#   for (i in 1:n) {
+#     
+#     if(match_n$winner_name[i] == player){
+#       data[i,1:32] <- t(as.vector(match_n[i, c(3, winner)]))
+#       data[i, 33] <- 'winner'
+#       data[i, 34] <- match_n[i, 56]
+#       data[i, 35] <- match_n[i, 62]
+#     }
+#     
+#     else{
+#       data[i,1:32] <- t(as.vector(match_n[i, c(3, loser)]))
+#       data[i, 33] <- 'loser'
+#       data[i, 34] <- match_n[i, 56]
+#       data[i, 35] <- match_n[i, 62]
+#     }
+#   }
+#   
+#   data <- as.data.frame(data)
+#   cols <- c(1:27, 29:32)
+#   data[, cols] <- sapply(data[, cols], as.numeric)  
+#   
+#   # for(i in 1:nrow(final_data)){
+#   #   
+#   #   if(name_last == final_data$name[i]){
+#   #     final_data[i, 72] <- final_data[i - 1, 72] + 1
+#   #     final_data[i, 41:71] <- (final_data[i-1, 41:71]*final_data[i - 1, 72] + final_data[i, 3:33])/final_data[i, 72]
+#   #   }
+#   #   
+#   #   else{
+#   #     final_data[i, 41:71] <- final_data[i, 3:33]
+#   #     final_data[i, 72] <- 1
+#   #   }
+#   #   
+#   #   name_last <- final_data$name[i]
+#   # }
+#   # 
+#   # names <- c(paste("average", colnames(final_data[3:33]), sep="_"), "num_games")
+#   # 
+#   # for (i in 41:72) {
+#   #   colnames(final_data)[i] <- names[i-40]
+#   # }
+#   
+#   
+#   return(data)
+# }
 
-
-
-
-
-
-
+# Read in final data ---------------------------------------------------------
+final_data <- read.csv("finaldata.csv", header = TRUE)
+final_data <- final_data[,-1]
