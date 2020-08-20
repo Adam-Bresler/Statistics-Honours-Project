@@ -508,29 +508,40 @@ data[, cols] <- sapply(data[, cols], as.numeric)
 
 # Ordering within each player ------------------------------------------------
 
-name_last <- "NULL"
+final_data <- read.csv('data_no_ytd.csv')
+final_data <- final_data[, -1]
 
-for(i in 1:nrow(final_data)){
+players_names<-unique(final_data$name)
+
+
+final_data_2 <- matrix(0,nrow=1,ncol=42)
+colnames(final_data_2) <- colnames(final_data)
+
+for(i in players_names){
   
-  if(name_last == final_data$name[i]){
+  current_data <- final_data[which(final_data$name==i),]
+  rows<- order(final_data[which(final_data$name==i),"tournament_date"],decreasing = FALSE)
+  current_data <- current_data[rows,]
+  tourney_dates<-unique(current_data$tournament_date)
+  current_player_data<- matrix(0,nrow=1,ncol=42)
+  colnames(current_player_data) <- colnames(final_data)
+  
+  for(i in tourney_dates){
     
+    current_data2 <- current_data[which(current_data$tournament_date==i),]
+    rows2<- order(current_data2[which(current_data2$tournament_date==i),"Match_order"],decreasing = TRUE)
+    current_data2 <- current_data2[rows2,]
+    current_player_data <- rbind(current_player_data,current_data2)
   }
+
   
-  else{
-    
-  }
+  final_data_2 <- rbind(final_data_2,current_player_data[-1,])
   
-  name_last <- final_data$name[i]
 }
 
+final_data_2 <- final_data_2[-1,]
 
-
-
-
-
-
-
-
+write.csv(final_data_2, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/finaldata2.csv")
 
 
 
