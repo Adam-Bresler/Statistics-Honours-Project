@@ -548,15 +548,10 @@ write.csv(final_data_2, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statist
 
 
 
-
-
-
-
-
 # Summing all previous data --------------------------------------------------
 library(stringr)
 
-final_data <- read.csv('data_no_ytd.csv')
+final_data <- read.csv('finaldata2.csv')
 final_data <- final_data[, -1]
 
 
