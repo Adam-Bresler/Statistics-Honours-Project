@@ -582,8 +582,8 @@ for (i in 43:74) {
   colnames(final_data)[i] <- names[i-42]
 }
 
-write.csv(final_data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/finaldata.csv")
-
+# write.csv(final_data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/finaldata.csv")
+write.csv(final_data, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/finaldata.csv")
 
 # X number average -----------------------------------------------------------
 
