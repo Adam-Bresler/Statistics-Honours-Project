@@ -587,77 +587,79 @@ write.csv(final_data, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistic
 
 # X number average -----------------------------------------------------------
 
-# last_game <- function(player, n = NA){
-#   
-#   ind <- which(match$winner_name == player | match$loser_name == player)
-#   
-#   if(is.na(n)){
-#     n = length(ind)
-#   }
-#   
-#   else{
-#     n = n
-#   }
-#   
-#   ind <- ind[1:n]
-#   
-#   match_n <- match[ind, ]
-#   
-#   data <- matrix(0, nrow = n, ncol = 35)
-#   
-#   
-#   winner <- grep("winner", colnames(match))
-#   loser <- grep("loser", colnames(match))
-#   
-#   colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl", "tourney_id", "Match_order")
-#   
-#   
-#   
-#   for (i in 1:n) {
-#     
-#     if(match_n$winner_name[i] == player){
-#       data[i,1:32] <- t(as.vector(match_n[i, c(3, winner)]))
-#       data[i, 33] <- 'winner'
-#       data[i, 34] <- match_n[i, 56]
-#       data[i, 35] <- match_n[i, 62]
-#     }
-#     
-#     else{
-#       data[i,1:32] <- t(as.vector(match_n[i, c(3, loser)]))
-#       data[i, 33] <- 'loser'
-#       data[i, 34] <- match_n[i, 56]
-#       data[i, 35] <- match_n[i, 62]
-#     }
-#   }
-#   
-#   data <- as.data.frame(data)
-#   cols <- c(1:27, 29:32)
-#   data[, cols] <- sapply(data[, cols], as.numeric)  
-#   
-#   # for(i in 1:nrow(final_data)){
-#   #   
-#   #   if(name_last == final_data$name[i]){
-#   #     final_data[i, 72] <- final_data[i - 1, 72] + 1
-#   #     final_data[i, 41:71] <- (final_data[i-1, 41:71]*final_data[i - 1, 72] + final_data[i, 3:33])/final_data[i, 72]
-#   #   }
-#   #   
-#   #   else{
-#   #     final_data[i, 41:71] <- final_data[i, 3:33]
-#   #     final_data[i, 72] <- 1
-#   #   }
-#   #   
-#   #   name_last <- final_data$name[i]
-#   # }
-#   # 
-#   # names <- c(paste("average", colnames(final_data[3:33]), sep="_"), "num_games")
-#   # 
-#   # for (i in 41:72) {
-#   #   colnames(final_data)[i] <- names[i-40]
-#   # }
-#   
-#   
-#   return(data)
-# }
+last_game <- function(player, n = NA){
+
+  ind <- which(match$winner_name == player | match$loser_name == player)
+
+  if(is.na(n)){
+    n = length(ind)
+  }
+
+  else{
+    n = n
+  }
+
+  ind <- ind[1:n]
+
+  match_n <- match[ind, ]
+
+  data <- matrix(0, nrow = n, ncol = 35)
+
+
+  winner <- grep("winner", colnames(match))
+  loser <- grep("loser", colnames(match))
+
+  colnames(data) <- c("duration", substring(colnames(match[winner]), 8), "wl", "tourney_id", "Match_order")
+
+
+
+  for (i in 1:n) {
+
+    if(match_n$winner_name[i] == player){
+      data[i,1:32] <- t(as.vector(match_n[i, c(3, winner)]))
+      data[i, 33] <- 'winner'
+      data[i, 34] <- match_n[i, 56]
+      data[i, 35] <- match_n[i, 62]
+    }
+
+    else{
+      data[i,1:32] <- t(as.vector(match_n[i, c(3, loser)]))
+      data[i, 33] <- 'loser'
+      data[i, 34] <- match_n[i, 56]
+      data[i, 35] <- match_n[i, 62]
+    }
+  }
+
+  data <- as.data.frame(data)
+  cols <- c(1:27, 29:32)
+  data[, cols] <- sapply(data[, cols], as.numeric)
+
+  # for(i in 1:nrow(final_data)){
+  #
+  #   if(name_last == final_data$name[i]){
+  #     final_data[i, 72] <- final_data[i - 1, 72] + 1
+  #     final_data[i, 41:71] <- (final_data[i-1, 41:71]*final_data[i - 1, 72] + final_data[i, 3:33])/final_data[i, 72]
+  #   }
+  #
+  #   else{
+  #     final_data[i, 41:71] <- final_data[i, 3:33]
+  #     final_data[i, 72] <- 1
+  #   }
+  #
+  #   name_last <- final_data$name[i]
+  # }
+  #
+  # names <- c(paste("average", colnames(final_data[3:33]), sep="_"), "num_games")
+  #
+  # for (i in 41:72) {
+  #   colnames(final_data)[i] <- names[i-40]
+  # }
+
+
+  return(data)
+}
+
+
 
 # Read in final data ---------------------------------------------------------
 final_data <- read.csv("finaldata.csv", header = TRUE)
