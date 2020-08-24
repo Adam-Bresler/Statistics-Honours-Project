@@ -664,3 +664,7 @@ last_game <- function(player, n = NA){
 # Read in final data ---------------------------------------------------------
 final_data <- read.csv("finaldata.csv", header = TRUE)
 final_data <- final_data[,-1]
+
+predictive_data <- final_data %>% select() %>% mutate(serve_dif = )
+
+
