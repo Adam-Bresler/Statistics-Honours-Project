@@ -545,9 +545,6 @@ write.csv(final_data_2, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statist
 
 
 
-
-
-
 # Summing all previous data --------------------------------------------------
 library(stringr)
 
