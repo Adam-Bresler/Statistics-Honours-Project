@@ -59,6 +59,6 @@ rolling_average_serve_return <- average_past_games(w_dat)
 
 write.csv(rolling_average_serve_return, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/rolling_average_serve_return.csv")
 
-
+dat <- read.csv("rolling_average_serve_return.csv") 
 
 
