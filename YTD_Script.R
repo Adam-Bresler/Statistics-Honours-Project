@@ -2,6 +2,7 @@ library(dplyr)
 library(tidyverse)
 library(lubridate)
 library(magrittr)
+library(caret)
 
 
 w_dat <- read.csv("finaldata2.csv")
@@ -158,22 +159,24 @@ table(rf_pred, test$wl)
 
 # Boosting -------------------------------------------------------------------
 library(gbm)
-train$wl <- as.numeric(train$wl) - 1
-str(train)
 
+
+
+ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
+gbm_grid <- expand.grid(n.trees = c(250, 500, 1000),
+                        interaction.depth = c(1, 2),
+                        shrinkage = c(0.1, 0.05, 0.01),
+                        n.minobsinnode = 1)
 set.seed(2020)
-gbm_lib <- gbm(wl ~ average_serve_rating + average_return_rating, data = train,
-               distribution = 'bernoulli', 
-               n.trees = 1000, #B
-               interaction.depth = 2, #d
-               shrinkage = 0.01, #lambda
-               bag.fraction = 1,  
-               cv.folds = 10, #built-in CV
-               verbose = F)
+gbm_tennis <- train(wl ~ average_serve_rating + average_return_rating, data = train, 
+                        method = 'gbm', 
+                        distribution = 'bernoulli', 
+                        trControl = ctrl, 
+                        verbose = F, 
+                        tuneGrid = gbm_grid)
 
-yhat_gbm <- predict.gbm(gbm_lib, test)
-(mse_gbm <- mean((test$wl - yhat_gbm)^2))
-
-
+gbm_pred <- predict(gbm_tennis, test)
+gbm_cf <- confusionMatrix(gbm_pred, test$wl)
+sum(diag(gbm_cf$table))/sum(gbm_cf$table)
 
 
