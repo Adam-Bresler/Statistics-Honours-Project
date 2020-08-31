@@ -101,6 +101,7 @@ ind <- 1:23731
 train <- predictive_dataset[ind, ]
 test <- predictive_dataset[-ind, ]
 
+set.seed(2020)
 mod <- glm(wl ~ average_serve_rating + average_return_rating, data = train, family = binomial)
 summary(mod)
 plot(sort(predict(mod, type = 'response')), type = "l")
@@ -122,7 +123,7 @@ spec <- conf_matrix[1,1]/(conf_matrix[1,1]+conf_matrix[2,1])
 library(tree)
 
 #Super basic, default everything
-
+set.seed(2020)
 tree_tennis<- tree(wl ~ average_serve_rating + average_return_rating, data = train, split = 'deviance')
 
 summary(tree_tennis) 
@@ -141,6 +142,7 @@ sum(diag(c_mat))/nrow(test)*100
 
 library(randomForest)
 
+set.seed(2020)
 rf_tennis <- randomForest(wl ~ average_serve_rating + average_return_rating, data = train, 
                            ntree = 1000, #no mtry argument, keep it defualt
                            importance = TRUE, 
@@ -156,9 +158,18 @@ table(rf_pred, test$wl)
 
 # Boosting -------------------------------------------------------------------
 library(gbm)
+train$wl <- as.numeric(train$wl) - 1
+str(train)
+
+set.seed(2020)
 gbm_lib <- gbm(wl ~ average_serve_rating + average_return_rating, data = train,
-               distribution = 'laplace', 
-               bag.fraction = 1) # default adds bagging
+               distribution = 'bernoulli', 
+               n.trees = 1000, #B
+               interaction.depth = 2, #d
+               shrinkage = 0.01, #lambda
+               bag.fraction = 1,  
+               cv.folds = 10, #built-in CV
+               verbose = F)
 
 yhat_gbm <- predict.gbm(gbm_lib, test)
 (mse_gbm <- mean((test$wl - yhat_gbm)^2))
