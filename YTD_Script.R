@@ -65,7 +65,22 @@ data <- data[,-1]
 #Eventually, add this into loop
 colnames(data)[c(10,11)] <- c("average_serve_rating", "average_return_rating")
 
-predictive <- reshape(data, idvar = "MatchID", timevar = "average_serve_rating", direction="wide")
+  
+predictive <- data %>% 
+  group_by(Match_ID)%>%arrange(.by_group = TRUE)
 
+predictive2 <- data %>% 
+  group_by(Match_ID)%>%arrange(.by_group = TRUE)%>%
+  select(c(1,10,11))
+
+predictive3 <- predictive[seq(1,52670,2),-c(10,11)]
+
+
+first_player<-predictive2[seq(1,52670,2),-1]
+second_player<-predictive2[seq(2,52670,2),-1]
+
+difference <- first_player-second_player
+
+predictive_dataset <- cbind(predictive3,difference)
 
 
