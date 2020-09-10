@@ -500,7 +500,7 @@ data[, cols] <- sapply(data[, cols], as.numeric)
 # write.csv(final_data, file = "C:/Users/Adam Bresler/Documents/2020/Honours/Project/Data/Working/data_no_ytd.csv")
 
 
-
+temp <- read.csv("data_no_ytd.csv")
 
 
 
@@ -541,7 +541,7 @@ for(i in players_names){
 
 final_data_2 <- final_data_2[-1,]
 
-write.csv(final_data_2, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/finaldata2.csv")
+#write.csv(final_data_2, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/finaldata2.csv")
 
 
 
