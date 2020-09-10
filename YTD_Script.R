@@ -35,6 +35,10 @@ w_dat$percent_total_points_won   <- (w_dat[,30] / w_dat[,31])*100
 # replacing NaN's 
 w_dat[which(is.na(w_dat$percent_break_points_saved)),48] <- 100
 w_dat[which(is.na(w_dat$percent_break_points_converted)),51] <- 0
+w_dat[which(is.na(w_dat$seed)),32] <- 0
+
+w_dat$seed <- as.factor(w_dat$seed)
+str(w_dat$seed)
 
 # Matching Player Hand -------------------------------------------------------
 
