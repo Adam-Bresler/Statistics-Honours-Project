@@ -18,22 +18,7 @@ w_dat$tournament_date <- lubridate::as_date(w_dat$tournament_date)
 
 
 # Matching Player Hand -------------------------------------------------------
-players <- read.csv("players.csv")
-players <- players[ , -1]
 
-plays <- players$plays
-plays <- strsplit(plays, ",")
-
-for (i in 1:773) {
-  players$hand[i] <- plays[[i]][1]
-  players$back[i] <- plays[[i]][2]
-}
-
-players <- players[,c("players", "hand")]
-colnames(players) <- c("name", "hand")
-
-w_dat$player_A_hand <- players$hand[match(w_dat$name, players$players)]
-w_dat$player_B_hand <- players$hand[match(w_dat$Opponent, players$players)]
 
 
 
