@@ -13,6 +13,29 @@ w_dat$tournament_date <- lubridate::as_date(w_dat$tournament_date)
 
 # Percentages ----------------------------------------------------------------
 
+# serve percentages
+w_dat$aces_percentage <- (w_dat[,7] / w_dat[,27])*100
+w_dat$dbl_fault_percentage <- (w_dat[,8] / w_dat[,14])*100
+w_dat$percent_first_serve_in <- (w_dat[,9] / w_dat[,10])*100
+w_dat$percent_first_serve_won<- (w_dat[,11] / w_dat[,12])*100
+w_dat$percent_second_serve_won<- (w_dat[,13] / w_dat[,14])*100
+w_dat$percent_break_points_saved <- (w_dat[,15] / w_dat[,16])*100
+
+# return percentages
+w_dat$percent_first_serve_return_won <- (w_dat[,19] / w_dat[,20])*100
+w_dat$percent_second_serve_return_won <- (w_dat[,21] / w_dat[,22])*100
+w_dat$percent_break_points_converted <- (w_dat[,23] / w_dat[,24])*100
+
+# percentage of point won
+w_dat$percent_service_points_won <- (w_dat[,26] / w_dat[,27])*100
+w_dat$percent_return_points_won  <- (w_dat[,28] / w_dat[,29])*100
+w_dat$percent_total_points_won   <- (w_dat[,30] / w_dat[,31])*100
+
+# replacing NaN's 
+w_dat[which(is.na(w_dat$percent_break_points_saved)),48] <- 100
+w_dat[which(is.na(w_dat$percent_break_points_converted)),51] <- 0
+
+
 
 
 
@@ -23,7 +46,7 @@ w_dat$tournament_date <- lubridate::as_date(w_dat$tournament_date)
 
 
 
-# Selecting Feastures --------------------------------------------------------
+# Selecting Features --------------------------------------------------------
 
 #Select serve and return ratings as our inital features
 w_dat <- w_dat[, c(1:4, 6, 18, 36, 37, 39)]
