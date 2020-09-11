@@ -143,5 +143,25 @@ predictive_dataset$wl <- ifelse(predictive_dataset$wl == 'winner', "Player A", "
 
 predictive_dataset$wl <- as.factor(predictive_dataset$wl)
 
+# Adding the seeding ---------------------------------------------------------
+
+predictive <- data %>%
+  group_by(Match_ID)%>%arrange(.by_group = TRUE)
+
+first_player<-predictive[seq(1,52522,2),-1]
+player_1_seed <-first_player$seed
+
+second_player<-predictive[seq(2,52522,2),-1]
+player_2_seed <-second_player$seed
+
+rm(predictive)
+
+predictive_dataset$player_A_seed <- player_1_seed
+predictive_dataset$player_B_seed <- player_2_seed
+
+predictive_dataset <- predictive_dataset[,c(1:4,99:100,6:98)]
+
+rm(first_player,second_player)
+
 
 
