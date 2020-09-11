@@ -35,7 +35,7 @@ w_dat$percent_total_points_won   <- (w_dat[,30] / w_dat[,31])*100
 # replacing NaN's 
 w_dat[which(is.na(w_dat$percent_break_points_saved)),48] <- 100
 w_dat[which(is.na(w_dat$percent_break_points_converted)),51] <- 0
-w_dat[which(is.na(w_dat$seed)),32] <- 0
+w_dat[which(is.na(w_dat$seed)),32] <- 34
 
 w_dat$seed <- as.factor(w_dat$seed)
 str(w_dat$seed)
@@ -57,19 +57,20 @@ w_dat$player_A_hand <- players$hand[match(w_dat$name, players$players)]
 w_dat$player_B_hand <- players$hand[match(w_dat$Opponent, players$players)]
 
 
+
 # Selecting Features --------------------------------------------------------
 
 #Select serve and return ratings as our inital features
-w_dat <- w_dat[, c(1:4, 6, 18, 36, 37, 39)]
+cols <- c(5:31, 33:35, 43:54)
+w_dat <- w_dat[, c(1:4, 32, 36:42, 55:56, cols)]
+
+#Exclude NA!
+w_dat <- w_dat[complete.cases(w_dat[, 15:56]),]
+
 data <- w_dat
 months = 24
 
-#Didnt exclude NA!
-w_dat <- w_dat[-which(is.na(w_dat$serve_rating)),]
-
-#w_dat <- w_dat[, c(1:4, )]
-
-average_past_games <- function(data, columns = c(5, 6), months = 24){
+average_past_games <- function(data, columns, months = 24){
   n <- nrow(data)
   player <- unique(data$name)
   return_matrix <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
@@ -86,7 +87,7 @@ average_past_games <- function(data, columns = c(5, 6), months = 24){
       matches <- dat %>% filter(dat$tournament_date <= dat$tournament_date[j] & dat$tournament_date >= (dat$tournament_date[j] - months(months)))
 
       if(j == 1){ #The first game has no ytd from before
-        average <- as.data.frame(t(c(0,0)))
+        average <- as.data.frame(t(rep(0, length(columns))))
         colnames(average) <- colnames(data)[columns]
       }
 
@@ -105,22 +106,22 @@ average_past_games <- function(data, columns = c(5, 6), months = 24){
   return(return_matrix[-1, ])
 }
 
-rolling_average_serve_return <- average_past_games(w_dat)
+rolling_average_all <- average_past_games(w_dat, 15:56)
  
-write.csv(rolling_average_serve_return, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/rolling_average_serve_return.csv")
+write.csv(rolling_average_all, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/rolling_average_all.csv")
 
 # Creating the predictive ----------------------------------------------------
-data <- read.csv("rolling_average_serve_return.csv") 
+data <- read.csv("rolling_average_all.csv")
 data <- data[,-1]
 
 #Eventually, add this into loop
 colnames(data)[c(10,11)] <- c("average_serve_rating", "average_return_rating")
 
-  
-predictive <- data %>% 
+
+predictive <- data %>%
   group_by(Match_ID)%>%arrange(.by_group = TRUE)
 
-predictive2 <- data %>% 
+predictive2 <- data %>%
   group_by(Match_ID)%>%arrange(.by_group = TRUE)%>%
   select(c(1,10,11))
 
