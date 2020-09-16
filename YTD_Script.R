@@ -163,5 +163,6 @@ predictive_dataset <- predictive_dataset[,c(1:4,99:100,6:98)]
 
 rm(first_player,second_player)
 
+write.csv(predictive_dataset, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/all_differences_no_custom_features.csv")
 
-
+# Begin with feature design --------------------------------------------------
