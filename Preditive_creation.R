@@ -1,3 +1,10 @@
+library(dplyr)
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+library(caret)
+library(stringr)
+
 # Creating the predictive ----------------------------------------------------
 data <- read.csv("rolling_average_all.csv")
 data <- data[,-1]
@@ -54,3 +61,33 @@ rm(first_player,second_player)
 #write.csv(predictive_dataset, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/all_differences_no_custom_features.csv")
 
 # Begin with feature design --------------------------------------------------
+
+predictive_dataset2 <- predictive_dataset
+
+# rm()
+
+predictive_dataset2$wl <- as.factor(predictive_dataset2$wl)
+predictive_dataset2$seed <- predictive_dataset2$player_A_seed-predictive_dataset2$player_B_seed
+
+ind <- 1:23658
+train_data <- predictive_dataset2[ind, ]
+test_data <- predictive_dataset2[-ind, ]
+ 
+
+# Decision Tree --------------------------------------------------------------
+library(tree)
+
+
+tree_tennis<- tree(wl~seed, data = train_data, split = 'deviance')
+
+
+yhat<- predict(tree_tennis,  test_data, type = 'class')
+
+(c_mat <- table(yhat, test_data$wl))          
+sum(diag(c_mat))/nrow(test_data)*100                
+1 - sum(diag(c_mat))/nrow(test_data)
+
+# rm()
+
+
+
