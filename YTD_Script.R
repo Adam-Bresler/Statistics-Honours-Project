@@ -60,7 +60,6 @@ w_dat$player_B_hand <- players$hand[match(w_dat$Opponent, players$players)]
 
 # Selecting Features --------------------------------------------------------
 
-#Select serve and return ratings as our inital features
 cols <- c(5:31, 33:35, 43:54)
 w_dat <- w_dat[, c(1:4, 32, 36:42, 55:56, cols)]
 
@@ -110,9 +109,61 @@ rolling_average_all <- average_past_games(w_dat, 15:56)
 
 # Weighting for different time periods ---------------------------------------
 
+average_past_games <- function(data, columns, months = 24){
+  n <- nrow(data)
+  player <- unique(data$name)
+  return_matrix <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
+  colnames(return_matrix) <- c(colnames(data), colnames(data)[columns])
+  
+  
+  
+  for(i in player){
+    dat <- data %>% filter(name == i)
+    player_dat <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
+    colnames(player_dat) <- colnames(return_matrix)
+    
+    for(j in 1:nrow(dat)){ # This include all matches in a tournament, even if we are in the quarters. Thus, we need to remove the semis etc
+      matches <- dat %>% filter(dat$tournament_date <= dat$tournament_date[j] & dat$tournament_date >= (dat$tournament_date[j] - months(months)))
+      
+      if(j == 1){ #The first game has no ytd from before
+        average <- as.data.frame(t(rep(0, length(columns))))
+        colnames(average) <- colnames(data)[columns]
+      }
+      
+      else{
+        ind <- which(matches$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
+        matches <- matches[1:(ind-1), ]
+        average <- matches %>% select(columns) %>% summarise_if(is.numeric, mean)
+      }
+      
+      player_dat <- rbind(player_dat, cbind(dat[j, ], average))
+    }
+    
+    return_matrix <- rbind(return_matrix, player_dat[-1, ])
+  }
+  
+  return(return_matrix[-1, ])
+}
+  
 
- 
-write.csv(rolling_average_all, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/rolling_average_all.csv")
+for (m in months) {
+  months <- months[m]  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#write.csv(rolling_average_all, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/rolling_average_all.csv")
 
 
 
