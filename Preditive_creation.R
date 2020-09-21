@@ -177,7 +177,5 @@ sum(diag(c_mat))/nrow(test_data)*100
 1 - sum(diag(c_mat))/nrow(test_data)
 
 
-
-
 length(which(predictive_dataset$wl=="Player A"))
 length(which(predictive_dataset$wl=="Player B"))
