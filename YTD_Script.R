@@ -152,13 +152,11 @@ weighted_average_past_games <- function(data, columns, months_vec = 24){
   return(return_matrix[-1, ])
 }
 
-test <- weighted_average_past_games(w_dat, 15:56, c(6,12))
-
 
 #write.csv(rolling_average_all, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/rolling_average_all.csv")
 
 # Take 2 ---------------------------------------------------------------------
-weighted_average_past_games <- function(data, columns, months_vec = 24){
+weighted_average_past_games_2 <- function(data, columns, months_vec = 24){
   n <- nrow(data)
   player <- unique(data$name)
   return_matrix <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
@@ -171,31 +169,74 @@ weighted_average_past_games <- function(data, columns, months_vec = 24){
     
     for(j in 1:nrow(dat)){ # This include all matches in a tournament, even if we are in the quarters. Thus, we need to remove the semis etc
         matches_6_months <- dat %>% filter(dat$tournament_date <= dat$tournament_date[j] & dat$tournament_date >= (dat$tournament_date[j] - months(6)))
-        matches_12_months <- dat %>% filter(dat$tournament_date - months(6) <= 
-                                              dat$tournament_date[j] & dat$tournament_date >= (dat$tournament_date[j] - months(12)))
-        matches_24_months <- dat %>% filter(dat$tournament_date - months(12)<= 
-                                              dat$tournament_date[j] & dat$tournament_date >= (dat$tournament_date[j] - months(24)))
-        matches_all_after_24 <- dat %>% filter(dat$tournament_date - months(24) <= dat$tournament_date[j] )
+        matches_12_months <- dat %>% filter(dat$tournament_date < 
+                                              dat$tournament_date[j] - months(6) & dat$tournament_date >= (dat$tournament_date[j] - months(12)))
+        matches_24_months <- dat %>% filter(dat$tournament_date <
+                                              dat$tournament_date[j] - months(12) & dat$tournament_date >= (dat$tournament_date[j] - months(24)))
+        matches_all_after_24 <- dat %>% filter(dat$tournament_date < dat$tournament_date[j] - months(24))
         
-        if(j == 1 | nrow(matches) <= 1){ #The first game has no ytd from before
+        if(j == 1){ #The first game has no ytd from before
           average_initial <- as.data.frame(t(rep(0, length(columns))))
           colnames(average_initial) <- colnames(data)[columns]
-          averages[[m]] <- average_initial
+          average <- average_initial
         }
         
         else{
-          ind <- which(matches$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
-          if(ind == 1){
-            average_initial <- as.data.frame(t(rep(0, length(columns))))
-            colnames(average_initial) <- colnames(data)[columns]
-            averages[[m]] <- average_initial
+          if(nrow(matches_6_months) <= 1){
+            average_6 <- average_initial
           }
           else{
-            matches <- matches[1:(ind-1), ]
-            averages[[m]] <- matches %>% select(columns) %>% summarise_if(is.numeric, mean)
+            ind6 <- which(matches_6_months$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
+            matches_6_months <- matches_6_months[1:(ind6-1), ]
+            average_6 <- matches_6_months %>% select(columns) %>% summarise_if(is.numeric, mean)
+          }
+          
+          if(nrow(matches_12_months)<=1){
+            average_12 <- average_initial
+          }
+          else{
+            ind12 <- which(matches_12_months$Match_ID == dat$Match_ID[j])
+            matches_12_months <- matches_12_months[1:(ind12-1), ]
+            average_12 <- matches_12_months %>% select(columns) %>% summarise_if(is.numeric, mean)
+          }
+          
+          if(nrow(matches_24_months)<=1){
+            average_24 <- average_initial
+          }
+          else{
+            ind24 <- which(matches_24_months$Match_ID == dat$Match_ID[j])
+            matches_24_months <- matches_24_months[1:(ind24-1), ]
+            average_24 <- matches_24_months %>% select(columns) %>% summarise_if(is.numeric, mean)
+          }
+          
+          if(nrow(matches_all_after_24)<=1){
+            average_rest <- average_initial
+          }
+          else{
+          ind_rest <- which(matches_all_after_24$Match_ID == dat$Match_ID[j])
+          matches_all_after_24 <- matches_all_after_24[1:(ind_rest-1), ]
+          average_rest <- matches_all_after_24 %>% select(columns) %>% summarise_if(is.numeric, mean)
           }
         }
-      average <- as.data.frame(0.7*averages[[1]] + 0.3*averages[[2]])
+      
+      if(nrow(matches_6_months) > 1 & nrow(matches_12_months) > 1 & nrow(matches_24_months) > 1 & nrow(matches_all_after_24) > 1){
+        weights <- c(8,4,2,1)
+      }
+      else if(nrow(matches_6_months) <= 1 & nrow(matches_12_months) > 1 & nrow(matches_24_months) > 1 & nrow(matches_all_after_24) > 1){
+        weights <- c(0, 4, 2, 1)
+      }
+      else if(nrow(matches_6_months) > 1 & nrow(matches_12_months) > 1 & nrow(matches_24_months) <= 1 & nrow(matches_all_after_24) > 1){
+        weights <- c(4,2,0,1)
+      }
+      else if(nrow(matches_6_months) > 1 & nrow(matches_12_months) <= 1 & nrow(matches_24_months) > 1 & nrow(matches_all_after_24) > 1){
+          weights <- c(4,0,2,1)
+      }
+      else if(nrow(matches_6_months) > 1 & nrow(matches_12_months) > 1 & nrow(matches_24_months) > 1 & nrow(matches_all_after_24) <= 1){
+          weights <- c(4,2,1,0)
+      }  
+
+        
+      average <- average_initial
       player_dat <- rbind(player_dat, cbind(dat[j, ], average))
     }
     
@@ -205,5 +246,5 @@ weighted_average_past_games <- function(data, columns, months_vec = 24){
   return(return_matrix[-1, ])
 }
 
-
+test_2 <- weighted_average_past_games_2(w_dat, 15:56, c(6,12))
 
