@@ -105,10 +105,9 @@ H_2_H <- first_player_3
 head_to_head <- function(player1, player2){
   ind <- which(H_2_H$name == player1 & H_2_H$Opponent  == player2 )
   
-  if(is.empty(ind)){
-    return("Players have never met before.") 
+  if(is.empty(ind)|length(ind)==1){
+    return(list("Players have never met before.",ind))
   }
-  
   else{
     
     return(ind)
@@ -116,15 +115,52 @@ head_to_head <- function(player1, player2){
   
 }
 
-head_to_head("Rafael Nadal","Roger Federer")
+head_to_head("Roger Federer","Lloyd Harris")[2]
 
 
+H_2_H_test <- H_2_H
 
+# creating head to head record -----------------------------------------------
+
+H_2_H$head_to_head_record <- 0
 
 for (i in unique(H_2_H$name)){
- ind <- which(H_2_H$name == i)
- head_to_head(H_2_H$name[ind],H_2_H$Opponent[ind])
+ind <- which(H_2_H$name == i)
+opponents <- unique(H_2_H$Opponent[ind])
+
+ for (j in 1:length(opponents)){
+   matches <- head_to_head(i,opponents[j])
+   if (matches[1]=="Players have never met before."){
+     H_2_H$head_to_head_record[matches[[2]]] <- NA
+   }
+   else{
+     wins=0
+     total=0
+     H_2_H$head_to_head_record[matches[1]]<-NA
+     for (k in 2:length(matches)){
+       total=total+1
+       if(H_2_H$wl[matches[k-1]]=="winner"){
+       wins=wins+1 
+       }
+       h2h_percent=100*(wins/total) 
+       H_2_H$head_to_head_record[matches[k]]<-h2h_percent
+     }
+   }
+ }
 }
 
+# testing
+
+indices <- which(H_2_H$name == "Rafael Nadal" & H_2_H$Opponent  == "Roger Federer" )
+
+H_2_H[indices,c(2,3,4,141)]
+
+
+indices2 <- which(H_2_H$name == "David Ferrer" & H_2_H$Opponent  == "Andy Murray" )
+
+H_2_H[indices2,c(2,3,4,141)]
+
+
+length(which(is.na(H_2_H$head_to_head_record)))
 
 
