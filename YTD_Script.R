@@ -156,7 +156,7 @@ weighted_average_past_games <- function(data, columns, months_vec = 24){
 #write.csv(rolling_average_all, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/rolling_average_all.csv")
 
 # Take 2 ---------------------------------------------------------------------
-weighted_average_past_games_2 <- function(data, columns, months_vec = 24){
+weighted_average_past_games_2 <- function(data, columns){
   n <- nrow(data)
   player <- unique(data$name)
   return_matrix <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
@@ -195,8 +195,6 @@ weighted_average_past_games_2 <- function(data, columns, months_vec = 24){
             average_12 <- average_initial
           }
           else{
-            ind12 <- which(matches_12_months$Match_ID == dat$Match_ID[j])
-            matches_12_months <- matches_12_months[1:(ind12-1), ]
             average_12 <- matches_12_months %>% select(columns) %>% summarise_if(is.numeric, mean)
           }
           
@@ -204,8 +202,6 @@ weighted_average_past_games_2 <- function(data, columns, months_vec = 24){
             average_24 <- average_initial
           }
           else{
-            ind24 <- which(matches_24_months$Match_ID == dat$Match_ID[j])
-            matches_24_months <- matches_24_months[1:(ind24-1), ]
             average_24 <- matches_24_months %>% select(columns) %>% summarise_if(is.numeric, mean)
           }
           
@@ -213,30 +209,82 @@ weighted_average_past_games_2 <- function(data, columns, months_vec = 24){
             average_rest <- average_initial
           }
           else{
-          ind_rest <- which(matches_all_after_24$Match_ID == dat$Match_ID[j])
-          matches_all_after_24 <- matches_all_after_24[1:(ind_rest-1), ]
-          average_rest <- matches_all_after_24 %>% select(columns) %>% summarise_if(is.numeric, mean)
+            average_rest <- matches_all_after_24 %>% select(columns) %>% summarise_if(is.numeric, mean)
           }
         }
       
-      if(nrow(matches_6_months) > 1 & nrow(matches_12_months) > 1 & nrow(matches_24_months) > 1 & nrow(matches_all_after_24) > 1){
+      if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) >= 1){
         weights <- c(8,4,2,1)
+        sum <- 15
       }
-      else if(nrow(matches_6_months) <= 1 & nrow(matches_12_months) > 1 & nrow(matches_24_months) > 1 & nrow(matches_all_after_24) > 1){
+      else if(nrow(matches_6_months) < 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) >= 1){
         weights <- c(0, 4, 2, 1)
+        sum <- 7
       }
-      else if(nrow(matches_6_months) > 1 & nrow(matches_12_months) > 1 & nrow(matches_24_months) <= 1 & nrow(matches_all_after_24) > 1){
+      else if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) < 1 & nrow(matches_all_after_24) >= 1){
         weights <- c(4,2,0,1)
+        sum <- 7
       }
-      else if(nrow(matches_6_months) > 1 & nrow(matches_12_months) <= 1 & nrow(matches_24_months) > 1 & nrow(matches_all_after_24) > 1){
+      else if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) < 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) >= 1){
           weights <- c(4,0,2,1)
+          sum <- 7
       }
-      else if(nrow(matches_6_months) > 1 & nrow(matches_12_months) > 1 & nrow(matches_24_months) > 1 & nrow(matches_all_after_24) <= 1){
+      else if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) < 1){
           weights <- c(4,2,1,0)
+          sum <- 7
       }  
-
-        
+      else if(nrow(matches_6_months) < 1 & nrow(matches_12_months) < 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) >= 1){
+          weights <- c(0,0,2,1)
+          sum <- 3
+      }
+      else if(nrow(matches_6_months) < 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) < 1 & nrow(matches_all_after_24) >= 1){
+          weights <- c(0,2,0,1)
+          sum <- 3
+      }
+      else if(nrow(matches_6_months) < 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) < 1){
+          weights <- c(0,2,1,0)
+          sum <- 3
+      }
+      else if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) < 1 & nrow(matches_24_months) < 1 & nrow(matches_all_after_24) >= 1){
+          weights <- c(2,0,0,1)
+          sum <- 3
+      }
+      else if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) < 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) < 1){
+          weights <- c(2,0,1,0)
+          sum <- 3
+      }
+      else if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) < 1 & nrow(matches_all_after_24) < 1){
+          weights <- c(2,1,0,0)
+          sum <- 3
+      } 
+      else if(nrow(matches_6_months) < 1 & nrow(matches_12_months) < 1 & nrow(matches_24_months) < 1 & nrow(matches_all_after_24) >= 1){
+          weights <- c(0,0,0,1)
+          sum <- 1
+      }  
+      else if(nrow(matches_6_months) < 1 & nrow(matches_12_months) < 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) < 1){
+          weights <- c(0,0,1,0)
+          sum <- 1
+      }
+      else if(nrow(matches_6_months) < 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) < 1 & nrow(matches_all_after_24) < 1){
+          weights <- c(0,1,0,0)
+          sum <- 1
+      }
+      else if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) < 1 & nrow(matches_24_months) < 1 & nrow(matches_all_after_24) < 1){
+          weights <- c(1,0,0,0)
+          sum <- 1
+      } 
+      else{
+        weights <- c(0,0,0,0)
+        sum <- 0
+      }
+      
+      if(sum == 0 | j == 1){      
       average <- average_initial
+      }
+      else{
+        average <- (weights[1]*average_6 + weights[2]*average_12 + weights[3]*average_24 + weights[4]*average_rest)/sum
+      }
+      
       player_dat <- rbind(player_dat, cbind(dat[j, ], average))
     }
     
@@ -246,5 +294,5 @@ weighted_average_past_games_2 <- function(data, columns, months_vec = 24){
   return(return_matrix[-1, ])
 }
 
-test_2 <- weighted_average_past_games_2(w_dat, 15:56, c(6,12))
+weighted_rolling_average <- weighted_average_past_games_2(w_dat, 15:56)
 
