@@ -135,7 +135,6 @@ rolling_average_by_court <- function(data, columns, months = 24){
           colnames(average) <- colnames(data)[columns]   
         }
         else{
-          
           matches <- matches[1:(ind-1), ]
           average <- matches %>% select(columns) %>% summarise_if(is.numeric, mean)
         }
@@ -338,8 +337,13 @@ weighted_rolling_average_by_court <- function(data, columns){
         }
         else{
           ind6 <- which(matches_6_months$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
+          if(ind6 == 1){
+            average_6 <- average_initial
+          }
+          else{
           matches_6_months <- matches_6_months[1:(ind6-1), ]
           average_6 <- matches_6_months %>% select(columns) %>% summarise_if(is.numeric, mean)
+          }
         }
         
         if(nrow(matches_12_months)<=1){
@@ -444,6 +448,9 @@ weighted_rolling_average_by_court <- function(data, columns){
   
   return(return_matrix[-1, ])
 }
+data <- read.csv("final_rolled_weighted_court.csv")
+data <- data[,-c(1, 183:224)]
+data$tournament_date <- lubridate::as_date(data$tournament_date)
 
 data <- weighted_rolling_average_by_court(data, 15:56)
 colnames(data)[c(183:224)] <- paste("weighted_by_court", colnames(data[15:56]), sep="_")

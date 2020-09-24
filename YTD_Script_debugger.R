@@ -69,15 +69,18 @@ data <- w_dat
 weighted_rolling_average_by_court <- function(data, columns){
   n <- nrow(data)
   player <- unique(data$name)
-  return_matrix <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
+  return_matrix <- as.data.frame(matrix(0, nrow = 1, ncol = ncol(data) + length(columns)))
+  return_matrix[,9] <- as.Date("2010-01-01")
   colnames(return_matrix) <- c(colnames(data), colnames(data)[columns])
   
   for(i in player){
     dat <- data %>% filter(name == i)
-    player_dat <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
+    player_dat <- as.data.frame(matrix(0, nrow = 1, ncol = ncol(data) + length(columns)))
+    player_dat[,9] <- as.Date("2010-01-01")
     colnames(player_dat) <- colnames(return_matrix)
     
     for(j in 1:nrow(dat)){ # This include all matches in a tournament, even if we are in the quarters. Thus, we need to remove the semis etc
+      j = 21
       matches_6_months <- dat %>% filter(dat$tournament_date <= dat$tournament_date[j] & dat$tournament_date >= (dat$tournament_date[j] %m-% months(6)))
       matches_6_months <- matches_6_months%>%filter(matches_6_months$tournament_surface==dat$tournament_surface[j])
       
@@ -104,6 +107,7 @@ weighted_rolling_average_by_court <- function(data, columns){
         }
         else{
           ind6 <- which(matches_6_months$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
+          
           matches_6_months <- matches_6_months[1:(ind6-1), ]
           average_6 <- matches_6_months %>% select(columns) %>% summarise_if(is.numeric, mean)
         }
@@ -202,14 +206,15 @@ weighted_rolling_average_by_court <- function(data, columns){
         average <- (weights[1]*average_6 + weights[2]*average_12 + weights[3]*average_24 + weights[4]*average_rest)/sum
       }
       
-      player_dat <- rbind(player_dat, cbind(dat[j, ], average))
+      player_dat <- rbind.data.frame(player_dat, cbind.data.frame(dat[j, ], average))
     }
     
-    return_matrix <- rbind(return_matrix, player_dat[-1, ])
+    return_matrix <- rbind.data.frame(return_matrix, player_dat[-1, ])
   }
   
   return(return_matrix[-1, ])
 }
+
 
 data <- weighted_rolling_average_by_court(data, 15:56)
 colnames(data)[c(183:224)] <- paste("weighted_rolling_average_by_court", colnames(data[15:56]), sep="_")
