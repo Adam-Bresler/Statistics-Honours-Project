@@ -56,54 +56,57 @@ average_past_games <- function(data, columns, months = 24){
 # rolling_average_court <- read.csv("rolling_average_court.csv")
 # rolling_average_court <- rolling_average_court[,-1]
 
+
 # Head to head ---------------------------------------------------------------
+
 
 
 library(installr)
 
 
-data_H_2_H <-  rolling_average_court
+data_H_2_H <-read.csv("final_data_no_H2H.csv")
+data_H_2_H <- data_H_2_H[,-1]
   
-colnames(data_H_2_H)[c(57:98)] <- paste("rolling_average", colnames(data_H_2_H[15:56]), sep="_")
-colnames(data_H_2_H)[c(99:140)] <- paste("rolling_average_court", colnames(data_H_2_H[15:56]), sep="_")
+# colnames(data_H_2_H)[c(57:98)] <- paste("rolling_average", colnames(data_H_2_H[15:56]), sep="_")
+# colnames(data_H_2_H)[c(99:140)] <- paste("rolling_average_court", colnames(data_H_2_H[15:56]), sep="_")
 
-H_2_H <- data_H_2_H %>%
-  group_by(Match_ID)%>%arrange(.by_group = TRUE)
-
-first_player<-H_2_H[seq(1,52522,2),]
-
-second_player<-H_2_H[seq(2,52522,2),]
+# H_2_H <- data_H_2_H %>%
+#   group_by(Match_ID)%>%arrange(.by_group = TRUE)
+# 
+# first_player<-H_2_H[seq(1,52522,2),]
+# 
+# second_player<-H_2_H[seq(2,52522,2),]
 
 
 # All previous games between any 2 players -----------------------------------
 
 
-w_dat <- read.csv("finaldata2.csv")
-w_dat <- w_dat[,-1]
-w_dat <- w_dat[,c(36,39)]
-
-# bring back the tournament date 
-for (i in 1:nrow(first_player)){
-  first_player$tournament_date[i] <- w_dat[which(w_dat$tourney_id==first_player$tourney_id[i])[1],2]
-}
+# w_dat <- read.csv("finaldata2.csv")
+# w_dat <- w_dat[,-1]
+# w_dat <- w_dat[,c(36,39)]
+# 
+# # bring back the tournament date 
+# for (i in 1:nrow(first_player)){
+#   first_player$tournament_date[i] <- w_dat[which(w_dat$tourney_id==first_player$tourney_id[i])[1],2]
+# }
 
 
 # order data
 
-first_player_3 <-first_player %>%
+H2H <-data_H_2_H %>%
   group_by(tournament_date)%>%arrange(.by_group = TRUE)
 
-for (i in unique(first_player_3$tourney_id)){
-  indices <- which(first_player_3$tourney_id==i)
-  first_player_3[indices,] <- first_player_3[indices,]%>%arrange(desc(Match_order))
+for (i in unique(data_H_2_H$tourney_id)){
+  indices <- which(H2H$tourney_id==i)
+  H2H[indices,] <- H2H[indices,]%>%arrange(desc(Match_order))
 }
 
 
-H_2_H <- first_player_3
+H_2_H <- H2H
 
 
 head_to_head <- function(player1, player2){
-  ind <- which(H_2_H$name == player1 & H_2_H$Opponent  == player2 )
+  ind <- which(H_2_H$Player_A == player1 & H_2_H$Player_B  == player2 )
   
   if(is.empty(ind)|length(ind)==1){
     return(list("Players have never met before.",ind))
@@ -115,18 +118,18 @@ head_to_head <- function(player1, player2){
   
 }
 
-head_to_head("Roger Federer","Lloyd Harris")[2]
+head_to_head("Roger Federer","Lloyd Harris")
 
 
-H_2_H_test <- H_2_H
+
 
 # creating head to head record -----------------------------------------------
 
 H_2_H$head_to_head_record <- 0
 
-for (i in unique(H_2_H$name)){
-ind <- which(H_2_H$name == i)
-opponents <- unique(H_2_H$Opponent[ind])
+for (i in unique(H_2_H$Player_A)){
+ind <- which(H_2_H$Player_A == i)
+opponents <- unique(H_2_H$Player_B[ind])
 
  for (j in 1:length(opponents)){
    matches <- head_to_head(i,opponents[j])
@@ -139,7 +142,7 @@ opponents <- unique(H_2_H$Opponent[ind])
      H_2_H$head_to_head_record[matches[1]]<-NA
      for (k in 2:length(matches)){
        total=total+1
-       if(H_2_H$wl[matches[k-1]]=="winner"){
+       if(H_2_H$wl[matches[k-1]]=="Player A"){
        wins=wins+1 
        }
        h2h_percent=100*(wins/total) 
@@ -151,19 +154,19 @@ opponents <- unique(H_2_H$Opponent[ind])
 
 # testing
 
-indices <- which(H_2_H$name == "Rafael Nadal" & H_2_H$Opponent  == "Roger Federer" )
+indices <- which(H_2_H$Player_A == "Rafael Nadal" & H_2_H$Player_B  == "Roger Federer" )
 
-H_2_H[indices,c(2,3,4,141)]
-
-
-indices2 <- which(H_2_H$name == "David Ferrer" & H_2_H$Opponent  == "Andy Murray" )
-
-H_2_H[indices2,c(2,3,4,141)]
+H_2_H[indices,c(2,3,4,436)]
 
 
-indices_overall <- which(H_2_H$name == "Rafael Nadal" & H_2_H$Opponent  == "Novak Djokovic" )
+indices2 <- which(H_2_H$Player_A  == "David Ferrer" & H_2_H$Player_B  == "Andy Murray" )
 
-H_2_H[indices_overall,c(2,3,4,141)]
+H_2_H[indices2,c(2,3,4,436)]
+
+
+indices_overall <- which(H_2_H$Player_A== "Rafael Nadal" & H_2_H$Player_B  == "Novak Djokovic" )
+
+H_2_H[indices_overall,c(2,3,4,436)]
 
 length(which(is.na(H_2_H$head_to_head_record)))
 
@@ -186,7 +189,7 @@ hard_court$head_to_head_record_court_surface <- 0
 # clay
 
 head_to_head_clay <- function(player1, player2){
-  ind <- which(clay$name == player1 & clay$Opponent  == player2 )
+  ind <- which(clay$Player_A == player1 & clay$Player_B  == player2 )
   
   if(is.empty(ind)|length(ind)==1){
     return(list("Players have never met before.",ind))
@@ -198,9 +201,9 @@ head_to_head_clay <- function(player1, player2){
   
 }
 
-for (i in unique(clay$name)){
-  ind_clay <- which(clay$name == i)
-  opponents <- unique(clay$Opponent[ind_clay])
+for (i in unique(clay$Player_A)){
+  ind_clay <- which(clay$Player_A == i)
+  opponents <- unique(clay$Player_B[ind_clay])
   
   for (j in 1:length(opponents)){
     matches <- head_to_head_clay(i,opponents[j])
@@ -213,7 +216,7 @@ for (i in unique(clay$name)){
       clay$head_to_head_record_court_surface[matches[1]]<-NA
       for (k in 2:length(matches)){
         total=total+1
-        if(clay$wl[matches[k-1]]=="winner"){
+        if(clay$wl[matches[k-1]]=="Player A"){
           wins=wins+1 
         }
         h2h_percent=100*(wins/total) 
@@ -224,14 +227,14 @@ for (i in unique(clay$name)){
 }
 
 
-indices_clay <- which(clay$name == "Rafael Nadal" & clay$Opponent  == "Novak Djokovic" )
+indices_clay <- which(clay$Player_A == "Rafael Nadal" & clay$Player_B  == "Novak Djokovic" )
 
-clay[indices_clay,c(2,3,4,142)]
+clay[indices_clay,c(2,3,4,437)]
 
 # grass
 
 head_to_head_grass <- function(player1, player2){
-  ind <- which(grass$name == player1 & grass$Opponent  == player2 )
+  ind <- which(grass$Player_A == player1 & grass$Player_B  == player2 )
   
   if(is.empty(ind)|length(ind)==1){
     return(list("Players have never met before.",ind))
@@ -243,9 +246,9 @@ head_to_head_grass <- function(player1, player2){
   
 }
 
-for (i in unique(grass$name)){
-  ind_grass <- which(grass$name == i)
-  opponents <- unique(grass$Opponent[ind_grass])
+for (i in unique(grass$Player_A)){
+  ind_grass <- which(grass$Player_A == i)
+  opponents <- unique(grass$Player_B[ind_grass])
   
   for (j in 1:length(opponents)){
     matches <- head_to_head_grass(i,opponents[j])
@@ -258,7 +261,7 @@ for (i in unique(grass$name)){
       grass$head_to_head_record_court_surface[matches[1]]<-NA
       for (k in 2:length(matches)){
         total=total+1
-        if(grass$wl[matches[k-1]]=="winner"){
+        if(grass$wl[matches[k-1]]=="Player A"){
           wins=wins+1 
         }
         h2h_percent=100*(wins/total) 
@@ -269,14 +272,14 @@ for (i in unique(grass$name)){
 }
 
 
-indices_grass <- which(grass$name == "Rafael Nadal" & grass$Opponent  == "Novak Djokovic" )
+indices_grass <- which(grass$Player_A == "Rafael Nadal" & grass$Player_B  == "Novak Djokovic" )
 
-grass[indices_grass,c(2,3,4,142)]
+grass[indices_grass,c(2,3,4,437)]
 
 # hard court
 
 head_to_head_hard_court <- function(player1, player2){
-  ind <- which(hard_court$name == player1 & hard_court$Opponent  == player2 )
+  ind <- which(hard_court$Player_A == player1 & hard_court$Player_B  == player2 )
   
   if(is.empty(ind)|length(ind)==1){
     return(list("Players have never met before.",ind))
@@ -288,9 +291,9 @@ head_to_head_hard_court <- function(player1, player2){
   
 }
 
-for (i in unique(hard_court$name)){
-  ind_hard_court <- which(hard_court$name == i)
-  opponents <- unique(hard_court$Opponent[ind_hard_court])
+for (i in unique(hard_court$Player_A)){
+  ind_hard_court <- which(hard_court$Player_A == i)
+  opponents <- unique(hard_court$Player_B[ind_hard_court])
   
   for (j in 1:length(opponents)){
     matches <- head_to_head_hard_court(i,opponents[j])
@@ -303,7 +306,7 @@ for (i in unique(hard_court$name)){
       hard_court$head_to_head_record_court_surface[matches[1]]<-NA
       for (k in 2:length(matches)){
         total=total+1
-        if(hard_court$wl[matches[k-1]]=="winner"){
+        if(hard_court$wl[matches[k-1]]=="Player A"){
           wins=wins+1 
         }
         h2h_percent=100*(wins/total) 
@@ -314,32 +317,40 @@ for (i in unique(hard_court$name)){
 }
 
 
-indices_hard_court <- which(hard_court$name == "Rafael Nadal" & hard_court$Opponent  == "Novak Djokovic" )
+indices_hard_court <- which(hard_court$Player_A == "Rafael Nadal" & hard_court$Player_B  == "Novak Djokovic" )
+hard_court[indices_hard_court,c(2,3,4,437)]
 
 # combining and adding to overall data set 
 
 
-grass_H2H <- grass[,c(1,2,3,4,6,7,9,12,142)]
-clay_H2H <- clay[,c(1,2,3,4,6,7,9,12,142)]
-hard_court_H2H <- hard_court[,c(1,2,3,4,6,7,9,12,142)]
+grass_H2H <- grass[,c(1,2,3,4,6,7,9,10,12,437)]
+clay_H2H <- clay[,c(1,2,3,4,6,7,9,10,12,437)]
+hard_court_H2H <- hard_court[,c(1,2,3,4,6,7,9,10,12,437)]
 
-court_H2H <- rbind(grass_H2H,clay_H2H,hard_court_H2H)
+court_H2H <- rbind.data.frame(grass_H2H,clay_H2H,hard_court_H2H)
 
 
 court_H2H <-court_H2H %>%
   group_by(tournament_date)%>%arrange(.by_group = TRUE)
 
-for (i in unique(court_H2H$tourney_id)){
-  indices <- which(court_H2H$tourney_id==i)
-  court_H2H[indices,] <- court_H2H[indices,]%>%arrange(desc(Match_order))
-}
+# for (i in unique(court_H2H$tourney_id)){
+#   indices <- which(court_H2H$tourney_id==i)
+#   court_H2H[indices,] <- court_H2H[indices,]%>%arrange(desc(Match_order))
+# }
 
 H_2_H$head_to_head_record_court_surface <- court_H2H$head_to_head_record_court_surface
 
 
-indices <- which(H_2_H$name == "Rafael Nadal" & H_2_H$Opponent  == "Novak Djokovic" )
+indices <- which(H_2_H$Player_A == "Rafael Nadal" & H_2_H$Player_B  == "Novak Djokovic" )
 
-H_2_H[indices,c(2,4,12,141,142)]
+H_2_H[indices,c(2,4,13,436,437)]
 
 str(H_2_H$head_to_head_record)
 str(H_2_H$head_to_head_record_court_surface)
+
+
+# write.csv(H_2_H, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/final_predictive_data.csv")
+
+
+
+
