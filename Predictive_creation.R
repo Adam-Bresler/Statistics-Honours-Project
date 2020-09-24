@@ -7,33 +7,32 @@ library(stringr)
 library(tree)
 
 # Creating the predictive ----------------------------------------------------
-data <- read.csv("rolling_average_all.csv")
+data <- read.csv("final_rolled_weighted_court.csv")
 data <- data[,-1]
 
 #Eventually, add this into loop
-colnames(data)[c(57:98)] <- paste("rolling_average", colnames(data[15:56]), sep="_")
-
+#colnames(data)[c(57:98)] <- paste("rolling_average", colnames(data[15:56]), sep="_")
 
 predictive <- data %>%
   group_by(Match_ID)%>%arrange(.by_group = TRUE)
 
 predictive2 <- data %>%
   group_by(Match_ID)%>%arrange(.by_group = TRUE)%>%
-  select(c(1,57:98))
+  select(c(1,57:224))
 
-predictive3 <- predictive[seq(1,52522,2),-c(57:98)]
+predictive3 <- predictive[seq(1,52522,2),-c(57:224)]
 
 # Trying to merge them -------------------------------------------------------
 
 first_player<-predictive[seq(1,52522,2),]
 second_player<-predictive[seq(2,52522,2),]
 
-colnames(first_player)[c(5,15:98)] <- paste("Player_A", colnames(first_player[c(5,15:98)]), sep="_")
-colnames(second_player)[c(5,15:98)] <- paste("Player_B", colnames(second_player[c(5,15:98)]), sep="_")
+colnames(first_player)[c(5,15:224)] <- paste("Player_A", colnames(first_player[c(5,15:224)]), sep="_")
+colnames(second_player)[c(5,15:224)] <- paste("Player_B", colnames(second_player[c(5,15:224)]), sep="_")
 
 second_player <- second_player[, -c(1:4, 6:14)]
 
-predictive_dataset <- cbind(first_player, second_player)
+predictive_dataset <- cbind.data.frame(first_player, second_player)
 
 colnames(predictive_dataset)[c(2,3)] <- c("Player_A", "Player_B")
 
@@ -41,7 +40,7 @@ predictive_dataset$wl <- ifelse(predictive_dataset$wl == 'winner', "Player A", "
 
 predictive_dataset$wl <- as.factor(predictive_dataset$wl)
 
-predictive_dataset <- predictive_dataset[, c(1:5, 99, 6:98, 100:183)] #Watch out for this! Change as data changes
+predictive_dataset <- predictive_dataset[, c(1:5, 225, 6:224, 226:435)] #Watch out for this! Change as data changes
 
 # ----------------------------------------------------------------------------
 # first_player<-predictive2[seq(1,52522,2),-1]
@@ -79,7 +78,7 @@ predictive_dataset <- predictive_dataset[, c(1:5, 99, 6:98, 100:183)] #Watch out
 # 
 # rm(first_player,second_player)
 
-#write.csv(predictive_dataset, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/all_differences_no_custom_features.csv")
+write.csv(predictive_dataset, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/final_data_no_h2h.csv")
 
 # Begin with feature design --------------------------------------------------
 
