@@ -4,7 +4,7 @@ library(lubridate)
 library(magrittr)
 library(caret)
 
-data <- read.csv("all_differences_no_custom_features.csv")
+data <- read.csv("final_predictive_data.csv")
 data <- data[,-1]
 data$wl <- as.factor(data$wl)
 # Model fitting --------------------------------------------------------------
@@ -16,7 +16,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 mod <- glm(as.formula(paste(colnames(data)[4], "~",
-                            paste(colnames(data)[88:99], collapse = "+"),
+                            paste(colnames(data)[c(5:6, 58:225, 268:435)], collapse = "+"),
                             sep = "")), data = train_data, family = binomial)
 summary(mod)
 plot(sort(predict(mod, type = 'response')), type = "l")
@@ -40,8 +40,9 @@ library(tree)
 #Super basic, default everything
 set.seed(2020)
 tree_tennis<- tree(as.formula(paste(colnames(data)[4], "~",
-                                    paste(colnames(data)[88:99], collapse = "+"),
-                                    sep = "")), data = train_data, split = 'deviance')
+                                    paste(colnames(data)[c(5:6, 58:225, 268:435)], collapse = "+"),
+                                    sep = "")), data = train_data, split = 'deviance', 
+                   control = tree.control(nobs=23658, mincut = 2, minsize = 4, mindev = 0.0001))
 
 summary(tree_tennis) 
 tree_tennis
@@ -54,6 +55,21 @@ yhat<- predict(tree_tennis,  test_data, type = 'class')
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
+yhat[which(is.na(yhat))]
+
+cv.tennis <- cv.tree(tree_tennis, FUN=prune.misclass)
+size <- cv.tennis$size
+plot(size, cv.tennis$dev, type = 'c', xlab = 'Number of terminal nodes', ylab = 'CV error')
+# add alpha values to the plot:
+cv.tennis$k[1] <- 0
+alpha <- round(cv.tennis$k,1)
+axis(3, at = size, lab = alpha, cex.axis = 0.8)
+mtext(expression(alpha), 3, line=2.5, cex=1.2)
+text(size, cv.tennis$dev, substitute(leaves, list(leaves = size)), cex = 0.9)
+
+prune.tree <- prune.misclass(tree_tennis, best = 7)
+plot(prune.tree)
+text(prune.tree, pretty=0, cex=0.8)
 # Random Forest --------------------------------------------------------------
 #Super basic, default everything
 
@@ -61,11 +77,11 @@ library(randomForest)
 
 set.seed(2020)
 rf_tennis <- randomForest(as.formula(paste(colnames(data)[4], "~",
-                                          paste(colnames(data)[88:99], collapse = "+"),
+                                          paste(colnames(data)[c(5:6, 58:225, 268:435)], collapse = "+"),
                                           sep = "")), data = train_data, 
-                          ntree = 1000, #no mtry argument, keep it defualt
+                          ntree = 200, #no mtry argument, keep it defualt
                           importance = TRUE, 
-                          do.trace = 100)
+                          do.trace = 10)
 
 rf_tennis
 
@@ -79,13 +95,13 @@ table(rf_pred, test_data$wl)
 library(gbm)
 
 ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
-gbm_grid <- expand.grid(n.trees = c(250, 500, 1000),
+gbm_grid <- expand.grid(n.trees = c(50, 100, 200),
                         interaction.depth = c(1, 2),
-                        shrinkage = c(0.1, 0.05, 0.01),
+                        shrinkage = c(0.1, 0.05),
                         n.minobsinnode = 1)
 set.seed(2020)
 gbm_tennis <- train(as.formula(paste(colnames(data)[4], "~",
-                                          paste(colnames(data)[88:99], collapse = "+"),
+                                          paste(colnames(data)[c(5:6, 58:225, 268:435)], collapse = "+"),
                                           sep = "")), data = train_data, 
                     method = 'gbm', 
                     distribution = 'bernoulli', 
