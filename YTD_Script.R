@@ -448,12 +448,12 @@ weighted_rolling_average_by_court <- function(data, columns){
   
   return(return_matrix[-1, ])
 }
-data <- read.csv("final_rolled_weighted_court.csv")
-data <- data[,-c(1, 183:224)]
-data$tournament_date <- lubridate::as_date(data$tournament_date)
-
-data <- weighted_rolling_average_by_court(data, 15:56)
-colnames(data)[c(183:224)] <- paste("weighted_by_court", colnames(data[15:56]), sep="_")
+# data <- read.csv("final_rolled_weighted_court.csv")
+# data <- data[,-c(1, 183:224)]
+# data$tournament_date <- lubridate::as_date(data$tournament_date)
+# 
+# data <- weighted_rolling_average_by_court(data, 15:56)
+# colnames(data)[c(183:224)] <- paste("weighted_by_court", colnames(data[15:56]), sep="_")
 
 # Write the final ------------------------------------------------------------
 #write.csv(data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/final_rolled_weighted_court.csv")
@@ -461,6 +461,7 @@ colnames(data)[c(183:224)] <- paste("weighted_by_court", colnames(data[15:56]), 
 # Add in new features --------------------------------------------------------
 data <- read.csv("final_rolled_weighted_court.csv")
 data <- data[,-1]
+data$tournament_date <- lubridate::as_date(data$tournament_date)
 
 data$break_points_serve_total_adjusted <- ifelse(data$break_points_serve_total == 0, 0.5, data$break_points_serve_total)
 data$break_point_serve_feature <- (exp(data[,25])/exp(data[,26]))*(data[,27]/data[,225])
