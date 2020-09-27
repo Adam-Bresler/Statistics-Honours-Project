@@ -456,7 +456,7 @@ data <- weighted_rolling_average_by_court(data, 15:56)
 colnames(data)[c(183:224)] <- paste("weighted_by_court", colnames(data[15:56]), sep="_")
 
 # Write the final ------------------------------------------------------------
-write.csv(data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/final_rolled_weighted_court.csv")
+#write.csv(data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/final_rolled_weighted_court.csv")
 
 # Add in new features --------------------------------------------------------
 data <- read.csv("final_rolled_weighted_court.csv")
