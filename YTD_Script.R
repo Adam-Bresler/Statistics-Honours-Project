@@ -5,65 +5,65 @@ library(magrittr)
 library(caret)
 library(stringr)
 
-w_dat <- read.csv("finaldata2.csv")
-w_dat <- w_dat[, -1]
-w_dat$tournament_date <- lubridate::as_date(w_dat$tournament_date)
-
-#w_dat$first_serve_percentage <- round((w_dat$first_serves_in/w_dat$first_serves_total)*100,3)
-# We need to convert our data to percentages
-
-# Percentages ----------------------------------------------------------------
-
-# serve percentages
-w_dat$aces_percentage <- (w_dat[,7] / w_dat[,27])*100
-w_dat$dbl_fault_percentage <- (w_dat[,8] / w_dat[,14])*100
-w_dat$percent_first_serve_in <- (w_dat[,9] / w_dat[,10])*100
-w_dat$percent_first_serve_won<- (w_dat[,11] / w_dat[,12])*100
-w_dat$percent_second_serve_won<- (w_dat[,13] / w_dat[,14])*100
-w_dat$percent_break_points_saved <- (w_dat[,15] / w_dat[,16])*100
-
-# return percentages
-w_dat$percent_first_serve_return_won <- (w_dat[,19] / w_dat[,20])*100
-w_dat$percent_second_serve_return_won <- (w_dat[,21] / w_dat[,22])*100
-w_dat$percent_break_points_converted <- (w_dat[,23] / w_dat[,24])*100
-
-# percentage of point won
-w_dat$percent_service_points_won <- (w_dat[,26] / w_dat[,27])*100
-w_dat$percent_return_points_won  <- (w_dat[,28] / w_dat[,29])*100
-w_dat$percent_total_points_won   <- (w_dat[,30] / w_dat[,31])*100
-
-# replacing NaN's 
-w_dat[which(is.na(w_dat$percent_break_points_saved)),48] <- 100
-w_dat[which(is.na(w_dat$percent_break_points_converted)),51] <- 0
-w_dat[which(is.na(w_dat$seed)),32] <- 34
-
-w_dat$seed <- as.factor(w_dat$seed)
-str(w_dat$seed)
-
-# Matching Player Hand -------------------------------------------------------
-
-players <- read.csv("players.csv")
-players <- players[ , -1]
-
-plays <- players$plays
-plays <- strsplit(plays, ",")
-
-for (i in 1:773) {
-  players$hand[i] <- plays[[i]][1]
-  players$back[i] <- plays[[i]][2]
-}
-
-w_dat$player_A_hand <- players$hand[match(w_dat$name, players$players)]
-w_dat$player_B_hand <- players$hand[match(w_dat$Opponent, players$players)]
-
-# Selecting Features --------------------------------------------------------
-
-cols <- c(5:31, 33:35, 43:54)
-w_dat <- w_dat[, c(1:4, 32, 36:42, 55:56, cols)]
-
-#Exclude NA!
-w_dat <- w_dat[complete.cases(w_dat[, 15:56]),]
-data <- w_dat
+# w_dat <- read.csv("finaldata2.csv")
+# w_dat <- w_dat[, -1]
+# w_dat$tournament_date <- lubridate::as_date(w_dat$tournament_date)
+# 
+# #w_dat$first_serve_percentage <- round((w_dat$first_serves_in/w_dat$first_serves_total)*100,3)
+# # We need to convert our data to percentages
+# 
+# # Percentages ----------------------------------------------------------------
+# 
+# # serve percentages
+# w_dat$aces_percentage <- (w_dat[,7] / w_dat[,27])*100
+# w_dat$dbl_fault_percentage <- (w_dat[,8] / w_dat[,14])*100
+# w_dat$percent_first_serve_in <- (w_dat[,9] / w_dat[,10])*100
+# w_dat$percent_first_serve_won<- (w_dat[,11] / w_dat[,12])*100
+# w_dat$percent_second_serve_won<- (w_dat[,13] / w_dat[,14])*100
+# w_dat$percent_break_points_saved <- (w_dat[,15] / w_dat[,16])*100
+# 
+# # return percentages
+# w_dat$percent_first_serve_return_won <- (w_dat[,19] / w_dat[,20])*100
+# w_dat$percent_second_serve_return_won <- (w_dat[,21] / w_dat[,22])*100
+# w_dat$percent_break_points_converted <- (w_dat[,23] / w_dat[,24])*100
+# 
+# # percentage of point won
+# w_dat$percent_service_points_won <- (w_dat[,26] / w_dat[,27])*100
+# w_dat$percent_return_points_won  <- (w_dat[,28] / w_dat[,29])*100
+# w_dat$percent_total_points_won   <- (w_dat[,30] / w_dat[,31])*100
+# 
+# # replacing NaN's 
+# w_dat[which(is.na(w_dat$percent_break_points_saved)),48] <- 100
+# w_dat[which(is.na(w_dat$percent_break_points_converted)),51] <- 0
+# w_dat[which(is.na(w_dat$seed)),32] <- 34
+# 
+# w_dat$seed <- as.factor(w_dat$seed)
+# str(w_dat$seed)
+# 
+# # Matching Player Hand -------------------------------------------------------
+# 
+# players <- read.csv("players.csv")
+# players <- players[ , -1]
+# 
+# plays <- players$plays
+# plays <- strsplit(plays, ",")
+# 
+# for (i in 1:773) {
+#   players$hand[i] <- plays[[i]][1]
+#   players$back[i] <- plays[[i]][2]
+# }
+# 
+# w_dat$player_A_hand <- players$hand[match(w_dat$name, players$players)]
+# w_dat$player_B_hand <- players$hand[match(w_dat$Opponent, players$players)]
+# 
+# # Selecting Features --------------------------------------------------------
+# 
+# cols <- c(5:31, 33:35, 43:54)
+# w_dat <- w_dat[, c(1:4, 32, 36:42, 55:56, cols)]
+# 
+# #Exclude NA!
+# w_dat <- w_dat[complete.cases(w_dat[, 15:56]),]
+# data <- w_dat
 
 rolling_average <- function(data, columns, months = 24){
   n <- nrow(data)
@@ -466,8 +466,9 @@ data$tournament_date <- lubridate::as_date(data$tournament_date)
 data$break_points_serve_total_adjusted <- ifelse(data$break_points_serve_total == 0, 0.5, data$break_points_serve_total)
 data$break_point_serve_feature <- (exp(data[,25])/exp(data[,26]))*(data[,27]/data[,225])
 
-data$break_points_return_total_adjusted <- ifelse(data$break_points_return_total == 0, 2, data$break_points_return_total)
-data$break_point_return_feature <- (exp(data[,34])/exp(data[,33]))*(data[,35]/data[,227])
+data$break_points_return_total_adjusted <- ifelse(data$break_points_return_total == 0, 0.1, data$break_points_return_total)
+data$break_point_return_feature <- (exp(data[,33])/exp(data[,34]))*(data[,227]/data[,35]) # But actually this is inverted!
+# WE want consistency so both must have high as good
 
 data <- rolling_average(data, c(226,228) , 24)
 colnames(data)[c(229, 230)] <- paste("rolling_average", colnames(data)[c(226,228)], sep="_")
@@ -477,3 +478,6 @@ data <- weighted_rolling_average(data, c(226,228))
 colnames(data)[c(233, 234)] <- paste("weighted_rolling_average", colnames(data)[c(226,228)], sep="_")
 data <- weighted_rolling_average_by_court(data, c(226,228))
 colnames(data)[c(235,236)] <- paste("weighted_by_court", colnames(data)[c(226,228)], sep="_")
+
+
+
