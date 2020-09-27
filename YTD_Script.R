@@ -101,8 +101,8 @@ rolling_average <- function(data, columns, months = 24){
   return(return_matrix[-1, ])
 }
 
-data <- rolling_average(data, 15:56, 24)
-colnames(data)[c(57:98)] <- paste("rolling_average", colnames(data[15:56]), sep="_")
+#data <- rolling_average(data, 15:56, 24)
+#colnames(data)[c(57:98)] <- paste("rolling_average", colnames(data[15:56]), sep="_")
 
 
 # Rolling average by court surface -------------------------------------------
@@ -149,8 +149,8 @@ rolling_average_by_court <- function(data, columns, months = 24){
   return(return_matrix[-1, ])
 }
 
-data <- rolling_average_by_court(data, 15:56, 24)
-colnames(data)[c(99:140)] <- paste("rolling_average_by_court", colnames(data[15:56]), sep="_")
+#data <- rolling_average_by_court(data, 15:56, 24)
+#colnames(data)[c(99:140)] <- paste("rolling_average_by_court", colnames(data[15:56]), sep="_")
 
 # Weighted Rolling Average ---------------------------------------------------------------------
 weighted_rolling_average <- function(data, columns){
@@ -293,8 +293,8 @@ weighted_rolling_average <- function(data, columns){
   return(return_matrix[-1, ])
 }
 
-data <- weighted_rolling_average(data, 15:56)
-colnames(data)[c(141:182)] <- paste("weighted_rolling_average", colnames(data[15:56]), sep="_")
+#data <- weighted_rolling_average(data, 15:56)
+#colnames(data)[c(141:182)] <- paste("weighted_rolling_average", colnames(data[15:56]), sep="_")
 
 # Weighted by court surface --------------------------------------------------
 weighted_rolling_average_by_court <- function(data, columns){
@@ -457,3 +457,19 @@ colnames(data)[c(183:224)] <- paste("weighted_by_court", colnames(data[15:56]), 
 
 # Write the final ------------------------------------------------------------
 write.csv(data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/final_rolled_weighted_court.csv")
+
+# Add in new features --------------------------------------------------------
+data <- read.csv("final_rolled_weighted_court.csv")
+data <- data[,-1]
+
+data$break_points_serve_total_adjusted <- ifelse(data$break_points_serve_total == 0, 0.5, data$break_points_serve_total)
+data$break_point_serve_feature <- (exp(data[,25])/exp(data[,26]))*(data[,27]/data[,225])
+
+data <- rolling_average(data, 226, 24)
+colnames(data)[c(57:98)] <- paste("rolling_average", colnames(data)[226], sep="_")
+data <- rolling_average_by_court(data, 226, 24)
+colnames(data)[c(99:140)] <- paste("rolling_average_by_court", colnames(data)[226], sep="_")
+data <- weighted_rolling_average(data, 226)
+colnames(data)[c(141:182)] <- paste("weighted_rolling_average", colnames(data)[226], sep="_")
+data <- weighted_rolling_average_by_court(data, 226)
+colnames(data)[c(183:224)] <- paste("weighted_by_court", colnames(data)[226], sep="_")
