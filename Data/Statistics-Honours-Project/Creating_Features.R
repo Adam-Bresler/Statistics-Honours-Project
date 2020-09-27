@@ -7,7 +7,6 @@ library(caret)
 data <- read.csv("final_predictive_data.csv")
 data <- data[,-1]
 data$wl <- as.factor(data$wl)
-data$wl <- relevel(data$wl,"Player B")
 
 features <- data[,1:15]
 
@@ -98,12 +97,11 @@ mod <- glm(as.formula(paste(colnames(features)[4], "~",
 summary(mod)
 plot(sort(predict(mod, type = 'response')), type = "l")
 
-threshold <- 0.5875821
+threshold <- 0.4124179
 y.hat <- ifelse(predict(mod, newdata = test_data, type = 'response') > threshold, "Player A", "Player B") 
 
 y.hat[which(is.na(y.hat))]
-y.hat <- as.factor(y.hat)
-y.hat <- relevel(y.hat,"Player B")
+
 conf_matrix <- table(y.hat, test_data$wl)
 conf_matrix
 
@@ -113,7 +111,7 @@ sens <- conf_matrix[2,2]/(conf_matrix[1,2]+conf_matrix[2,2])
 spec <- conf_matrix[1,1]/(conf_matrix[1,1]+conf_matrix[2,1])
 
 library(ROCR)
-prediction.object <- prediction(fitted(mod), labels = train_data$wl,label.ordering = c("Player B","Player A"))
+prediction.object <- prediction(fitted(mod), labels = train_data$wl,label.ordering = c("Player A","Player B"))
 
 roc <-  performance(prediction.object,"tpr","fpr") 
 par(mfrow = c(1,1))
