@@ -3,8 +3,9 @@ library(tidyverse)
 library(lubridate)
 library(magrittr)
 library(caret)
+library(stats)
 
-data <- read.csv("final_predictive_data.csv")
+data <- read.csv("BP_data_no_h2h.csv")
 data <- data[,-1]
 data$wl <- as.factor(data$wl)
 data$wl <- relevel(data$wl,"Player B")
@@ -13,8 +14,10 @@ features <- data[,1:15]
 
 # Using the rolling average --------------------------------------------------
 
-servadv_Player_A_RA <- data[,97] - data[,308]
-servadv_Player_B_RA <- data[,307] - data[,98]
+servadv_Player_A_RA <- data[,which(colnames(data) == "Player_B_rolling_average_percent_service_points_won")] - 
+  data[,which(colnames(data) == "Player_B_rolling_average_percent_return_points_won")]
+servadv_Player_B_RA <- data[,which(colnames(data) == "Player_B_rolling_average_percent_service_points_won")] - 
+  data[,which(colnames(data) == "Player_A_rolling_average_percent_return_points_won")]
 servadv_overall_RA <- servadv_Player_A_RA - servadv_Player_B_RA
 
 completeness_Player_A_RA <- data[,97]*data[,98]
@@ -63,7 +66,14 @@ features <- cbind.data.frame(features, servadv_Player_A_Weighted_RA_BC, servadv_
                              completeness_Player_B_Weighted_RA_BC)
 
 # Breakpoints ----------------------------------------------------------------
+bp_features <- data[,c(230:237, 452:459)]
 
+BP_adv_Player_A_RA <- data[,230] - data[,453]
+BP_adv_Player_B_RA <- data[,452] - data[,231]
+BP_adv_overall_RA <- BP_adv_Player_A_RA - BP_adv_Player_B_RA
+
+features <- cbind.data.frame(features, BP_adv_Player_A_RA, BP_adv_Player_B_RA, 
+                             BP_adv_overall_RA)
 
 
 # Testing using a tree -------------------------------------------------------
@@ -77,7 +87,7 @@ library(tree)
 #Super basic, default everything
 set.seed(2020)
 tree_tennis<- tree(as.formula(paste(colnames(features)[4], "~",
-                                    paste(colnames(features)[16:35], collapse = "+"),
+                                    paste(colnames(features)[c(18,35)], collapse = "+"),
                                     sep = "")), data = train_data, split = 'deviance')
 
 summary(tree_tennis) 
@@ -96,7 +106,7 @@ sum(diag(c_mat))/nrow(test_data)*100
 # Testing Using a GLM --------------------------------------------------------
 set.seed(2020)
 mod <- glm(as.formula(paste(colnames(features)[4], "~",
-                            paste(colnames(features)[33], collapse = "+"),
+                            paste(colnames(features)[c(18,23)], collapse = "+"),
                             sep = "")), data = train_data, family = binomial)
 summary(mod)
 plot(sort(predict(mod, type = 'response')), type = "l")

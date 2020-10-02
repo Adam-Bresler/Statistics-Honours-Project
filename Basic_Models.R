@@ -4,7 +4,7 @@ library(lubridate)
 library(magrittr)
 library(caret)
 
-data <- read.csv("final_predictive_data.csv")
+data <- read.csv("BP_data_no_h2h.csv")
 data <- data[,-1]
 data$wl <- as.factor(data$wl)
 # Model fitting --------------------------------------------------------------
