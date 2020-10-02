@@ -480,4 +480,5 @@ data <- weighted_rolling_average_by_court(data, c(226,228))
 colnames(data)[c(235,236)] <- paste("weighted_by_court", colnames(data)[c(226,228)], sep="_")
 
 
+# write.csv(data, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/BP_serve_and_return.csv")
 
