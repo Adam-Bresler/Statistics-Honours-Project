@@ -12,6 +12,20 @@ data$wl <- relevel(data$wl,"Player B")
 
 features <- data[,1:15]
 
+# duration feature -----------------------------------------------------------
+RA_duration_diff <- data[,which(colnames(data) == "Player_A_rolling_average_duration")]-data[,which(colnames(data) == "Player_B_rolling_average_duration")]
+Weighted_RA_duration_diff <-data[,which(colnames(data) == "Player_A_weighted_rolling_average_duration")]-data[,which(colnames(data) == "Player_B_weighted_rolling_average_duration")]
+RA_BC_duration_diff <-data[,which(colnames(data) == "Player_A_rolling_average_by_court_duration")]-data[,which(colnames(data) == "Player_B_rolling_average_by_court_duration")]
+Weighted_RA_BC_duration_diff <-data[,which(colnames(data) == "Player_A_weighted_by_court_duration")]-data[,which(colnames(data) == "Player_B_weighted_by_court_duration")]
+
+features <- cbind.data.frame(features,RA_duration_diff,Weighted_RA_duration_diff,RA_BC_duration_diff,Weighted_RA_BC_duration_diff)
+
+
+# seeding feature ------------------------------------------------------------
+seeding_diff <- data[,which(colnames(data) == "Player_A_seed")]-data[,which(colnames(data) == "Player_B_seed")]
+  
+features <- cbind.data.frame(features,seeding_diff)
+
 # Using the rolling average --------------------------------------------------
 
 servadv_Player_A_RA <- data[,which(colnames(data) == "Player_B_rolling_average_percent_service_points_won")] - 
