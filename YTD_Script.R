@@ -463,6 +463,9 @@ data <- read.csv("final_rolled_weighted_court.csv")
 data <- data[,-1]
 data$tournament_date <- lubridate::as_date(data$tournament_date)
 
+data <- data[-which(data$service_games_played == 0),]
+data <- data[-which(data$return_games_played == 0),]
+
 data$BP_per_service_game  <- data[,26]/data[,27]
 data$BP_saved_per_faced   <- data[,25]/data[,26]
 
@@ -473,13 +476,13 @@ data$BP_saved_per_faced <- ifelse(data$BP_saved_per_faced == "NaN", 1, data$BP_s
 data$BP_converted_per_created <- ifelse(data$BP_converted_per_created == "NaN", 0, data$BP_converted_per_created)
 
 data <- rolling_average(data, c(225:228) , 24)
-colnames(data)[c(229:232)] <- paste("rolling_average", colnames(data)[c(225:228)], sep="_")
+colnames(data[c(229:232)]) <- paste("rolling_average", colnames(data[c(225:228)]), sep="_")
 data <- rolling_average_by_court(data, c(225:228), 24)
-colnames(data)[c(233, 236)] <- paste("rolling_average_by_court", colnames(data)[c(225:228)], sep="_")
+colnames(data)[c(233:236)] <- paste("rolling_average_by_court", colnames(data)[c(225:228)], sep="_")
 data <- weighted_rolling_average(data, c(225:228))
-colnames(data)[c(237, 240)] <- paste("weighted_rolling_average", colnames(data)[c(225:228)], sep="_")
+colnames(data)[c(237:240)] <- paste("weighted_rolling_average", colnames(data)[c(225:228)], sep="_")
 data <- weighted_rolling_average_by_court(data, c(225:228))
-colnames(data)[c(241,244)] <- paste("weighted_by_court", colnames(data)[c(225:228)], sep="_")
+colnames(data)[c(241:244)] <- paste("weighted_by_court", colnames(data)[c(225:228)], sep="_")
 
 write.csv(data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/BP_serve_and_return_seperated.csv")
 
