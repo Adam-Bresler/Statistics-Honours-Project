@@ -80,7 +80,7 @@ features <- cbind.data.frame(features, servadv_Player_A_Weighted_RA_BC, servadv_
                              completeness_Player_B_Weighted_RA_BC)
 
 # Breakpoints ----------------------------------------------------------------
-bp_features <- data[,c(230:237, 452:459)]
+bp_features <- data[,c(1:15, 230:237, 452:459)]
 
 BP_adv_Player_A_RA <- data[,230] - data[,453]
 BP_adv_Player_B_RA <- data[,452] - data[,231]
@@ -119,9 +119,12 @@ sum(diag(c_mat))/nrow(test_data)*100
 
 # Testing Using a GLM --------------------------------------------------------
 set.seed(2020)
-mod <- glm(as.formula(paste(colnames(features)[4], "~",
-                            paste(colnames(features)[c(18,23)], collapse = "+"),
-                            sep = "")), data = train_data, family = binomial)
+#mod <- glm(as.formula(paste(colnames(features)[4], "~",
+#                            paste(colnames(features)[c(18,23)], collapse = "+"),
+#                            sep = "")), data = train_data, family = "binomial")
+
+mod <- glm(wl ~ servadv_overall_RA + BP_adv_overall_RA, data = train_data, family = 'binomial')
+
 summary(mod)
 plot(sort(predict(mod, type = 'response')), type = "l")
 
