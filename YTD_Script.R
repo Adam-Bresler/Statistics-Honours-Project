@@ -476,7 +476,7 @@ data$BP_saved_per_faced <- ifelse(data$BP_saved_per_faced == "NaN", 1, data$BP_s
 data$BP_converted_per_created <- ifelse(data$BP_converted_per_created == "NaN", 0, data$BP_converted_per_created)
 
 data <- rolling_average(data, c(225:228) , 24)
-colnames(data[c(229:232)]) <- paste("rolling_average", colnames(data[c(225:228)]), sep="_")
+colnames(data)[c(229:232)] <- paste("rolling_average", colnames(data[c(225:228)]), sep="_")
 data <- rolling_average_by_court(data, c(225:228), 24)
 colnames(data)[c(233:236)] <- paste("rolling_average_by_court", colnames(data)[c(225:228)], sep="_")
 data <- weighted_rolling_average(data, c(225:228))
