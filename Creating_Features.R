@@ -5,7 +5,7 @@ library(magrittr)
 library(caret)
 library(stats)
 
-data <- read.csv("BP_serve_and_return_seperated.csv")
+data <- read.csv("BP_separated_with_H2H.csv")
 data <- data[,-1]
 data$wl <- as.factor(data$wl)
 data$wl <- relevel(data$wl,"Player B")
@@ -28,14 +28,14 @@ features <- cbind.data.frame(features,seeding_diff)
 
 # Using the rolling average --------------------------------------------------
 
-servadv_Player_A_RA <- data[,which(colnames(data) == "Player_B_rolling_average_percent_service_points_won")] - 
+servadv_Player_A_RA <- data[,which(colnames(data) == "Player_A_rolling_average_percent_service_points_won")] - 
   data[,which(colnames(data) == "Player_B_rolling_average_percent_return_points_won")]
 servadv_Player_B_RA <- data[,which(colnames(data) == "Player_B_rolling_average_percent_service_points_won")] - 
   data[,which(colnames(data) == "Player_A_rolling_average_percent_return_points_won")]
 servadv_overall_RA <- servadv_Player_A_RA - servadv_Player_B_RA
 
 completeness_Player_A_RA <- data[,97]*data[,98]
-completeness_Player_B_RA <- data[,307]*data[,308]
+completeness_Player_B_RA <- data[,327]*data[,328]
 
 features <- cbind.data.frame(features, servadv_Player_A_RA, servadv_Player_B_RA, 
                              servadv_overall_RA, completeness_Player_A_RA, completeness_Player_B_RA)
@@ -44,54 +44,125 @@ features <- cbind.data.frame(features, servadv_Player_A_RA, servadv_Player_B_RA,
 #, data[,437]
 
 # Rolling Average by Court ---------------------------------------------------
-servadv_Player_A_RA_BC <- data[,139] - data[,350]
-servadv_Player_B_RA_BC <- data[,349] - data[,140]
+servadv_Player_A_RA_BC <- data[,139] - data[,370]
+servadv_Player_B_RA_BC <- data[,369] - data[,140]
 servadv_overall_RA_BC <- servadv_Player_A_RA - servadv_Player_B_RA
 
 completeness_Player_A_RA_BC <- data[,139]*data[,140]
-completeness_Player_B_RA_BC <- data[,349]*data[,350]
+completeness_Player_B_RA_BC <- data[,369]*data[,370]
 
 features <- cbind.data.frame(features, servadv_Player_A_RA_BC, servadv_Player_B_RA_BC, 
                              servadv_overall_RA_BC, completeness_Player_A_RA_BC, completeness_Player_B_RA_BC)
 
 # Weighted Rolling Average ---------------------------------------------------
 
-servadv_Player_A_Weighted_RA <- data[,181] - data[,392]
-servadv_Player_B_Weighted_RA <- data[,391] - data[,182]
+servadv_Player_A_Weighted_RA <- data[,181] - data[,412]
+servadv_Player_B_Weighted_RA <- data[,411] - data[,182]
 servadv_overall_Weighted_RA <- servadv_Player_A_RA - servadv_Player_B_RA
 
 completeness_Player_A_Weighted_RA <- data[,181]*data[,182]
-completeness_Player_B_Weighted_RA <- data[,391]*data[,392]
+completeness_Player_B_Weighted_RA <- data[,411]*data[,412]
 
 features <- cbind.data.frame(features, servadv_Player_A_Weighted_RA, servadv_Player_B_Weighted_RA, 
                              servadv_overall_Weighted_RA, completeness_Player_A_Weighted_RA, completeness_Player_B_Weighted_RA)
 
 # Weighted Rolling Average by Court ------------------------------------------
 
-servadv_Player_A_Weighted_RA_BC <- data[,223] - data[,434]
-servadv_Player_B_Weighted_RA_BC <- data[,433] - data[,224]
+servadv_Player_A_Weighted_RA_BC <- data[,223] - data[,454]
+servadv_Player_B_Weighted_RA_BC <- data[,453] - data[,224]
 servadv_overall_Weighted_RA_BC <- servadv_Player_A_RA - servadv_Player_B_RA
 
 completeness_Player_A_Weighted_RA_BC <- data[,223]*data[,224]
-completeness_Player_B_Weighted_RA_BC <- data[,433]*data[,434]
+completeness_Player_B_Weighted_RA_BC <- data[,453]*data[,454]
 
 features <- cbind.data.frame(features, servadv_Player_A_Weighted_RA_BC, servadv_Player_B_Weighted_RA_BC, 
                              servadv_overall_Weighted_RA_BC, completeness_Player_A_Weighted_RA_BC, 
                              completeness_Player_B_Weighted_RA_BC)
 
 # Breakpoints ----------------------------------------------------------------
-bp_features <- data[,c(1:15, 230:237, 452:459)]
 
-BP_adv_Player_A_RA <- data[,230] - data[,453]
-BP_adv_Player_B_RA <- data[,452] - data[,231]
-BP_adv_overall_RA <- BP_adv_Player_A_RA - BP_adv_Player_B_RA
+# Rolling average ------------------------------
+BP_conversion_adv_Player_A_RA <- data[,231] - data[,463]
+BP_conversion_adv_Player_B_RA <- data[,461] - data[,233]
+BP_conversion_adv_overall_RA <- BP_conversion_adv_Player_A_RA - BP_conversion_adv_Player_B_RA
 
-features <- cbind.data.frame(features, BP_adv_Player_A_RA, BP_adv_Player_B_RA, 
-                             BP_adv_overall_RA)
+BP_frequency_adv_Player_A_RA <- data[,230] - data[,462]
+BP_frequency_adv_Player_B_RA <- data[,460] - data[,232]
+BP_frequency_adv_overall_RA <- BP_frequency_adv_Player_A_RA - BP_frequency_adv_Player_B_RA
 
+features <- cbind.data.frame(features, BP_conversion_adv_Player_A_RA, BP_conversion_adv_Player_B_RA, 
+                             BP_conversion_adv_overall_RA, BP_frequency_adv_Player_A_RA, BP_frequency_adv_Player_B_RA, 
+                             BP_frequency_adv_overall_RA)
+
+
+# Rolling average by court ---------------------
+BP_conversion_adv_Player_A_RA_BC <- data[,235] - data[,467]
+BP_conversion_adv_Player_B_RA_BC <- data[,465] - data[,237]
+BP_conversion_adv_overall_RA_BC <- BP_conversion_adv_Player_A_RA_BC - BP_conversion_adv_Player_B_RA_BC
+
+BP_frequency_adv_Player_A_RA_BC <- data[,234] - data[,466]
+BP_frequency_adv_Player_B_RA_BC <- data[,464] - data[,236]
+BP_frequency_adv_overall_RA_BC <- BP_frequency_adv_Player_A_RA_BC - BP_frequency_adv_Player_B_RA_BC
+
+features <- cbind.data.frame(features, BP_conversion_adv_Player_A_RA_BC, BP_conversion_adv_Player_B_RA_BC, 
+                             BP_conversion_adv_overall_RA_BC, BP_frequency_adv_Player_A_RA_BC, BP_frequency_adv_Player_B_RA_BC, 
+                             BP_frequency_adv_overall_RA_BC)
+
+# Weighted Average -----------------------------
+BP_conversion_adv_Player_A_weighted_RA <- data[,239] - data[,471]
+BP_conversion_adv_Player_B_weighted_RA <- data[,469] - data[,241]
+BP_conversion_adv_overall_weighted_RA <- BP_conversion_adv_Player_A_weighted_RA - BP_conversion_adv_Player_B_weighted_RA
+
+BP_frequency_adv_Player_A_weighted_RA <- data[,238] - data[,470]
+BP_frequency_adv_Player_B_weighted_RA <- data[,468] - data[,240]
+BP_frequency_adv_overall_weighted_RA <- BP_frequency_adv_Player_A_weighted_RA - BP_frequency_adv_Player_B_weighted_RA
+
+features <- cbind.data.frame(features, BP_conversion_adv_Player_A_weighted_RA, BP_conversion_adv_Player_B_weighted_RA, 
+                             BP_conversion_adv_overall_weighted_RA, BP_frequency_adv_Player_A_weighted_RA, BP_frequency_adv_Player_B_weighted_RA, 
+                             BP_frequency_adv_overall_weighted_RA)
+
+# Weighted Average by court --------------------
+BP_conversion_adv_Player_A_weighted_RA_BC <- data[,243] - data[,475]
+BP_conversion_adv_Player_B_weighted_RA_BC <- data[,473] - data[,245]
+BP_conversion_adv_overall_weighted_RA_BC <- BP_conversion_adv_Player_A_weighted_RA_BC - BP_conversion_adv_Player_B_weighted_RA_BC
+
+BP_frequency_adv_Player_A_weighted_RA_BC <- data[,242] - data[,474]
+BP_frequency_adv_Player_B_weighted_RA_BC <- data[,472] - data[,244]
+BP_frequency_adv_overall_weighted_RA_BC <- BP_frequency_adv_Player_A_weighted_RA_BC - BP_frequency_adv_Player_B_weighted_RA_BC
+
+features <- cbind.data.frame(features, BP_conversion_adv_Player_A_weighted_RA_BC, BP_conversion_adv_Player_B_weighted_RA_BC, 
+                             BP_conversion_adv_overall_weighted_RA_BC, BP_frequency_adv_Player_A_weighted_RA_BC, BP_frequency_adv_Player_B_weighted_RA_BC, 
+                             BP_frequency_adv_overall_weighted_RA_BC)
+
+# Aces and double faults -----------------------------------------------------
+features <- cbind.data.frame(features, data[,c(88, 89, 130, 131, 172, 173, 214, 215, 318, 319, 360, 361, 402, 403, 444, 445)])
+colnames(features)[65:80] <- colnames(data)[c(88, 89, 130, 131, 172, 173, 214, 215, 318, 319, 360, 361, 402, 403, 444, 445)]
+
+# Games won and sets won -----------------------------------------------------
+features <- cbind.data.frame(features, data[,c(85, 86, 127, 128, 169, 170, 211, 212, 315, 316, 357, 358, 399, 400, 441, 442)])
+colnames(features)[81:96] <- colnames(data)[c(85, 86, 127, 128, 169, 170, 211, 212, 315, 316, 357, 358, 399, 400, 441, 442)]
+
+#write.csv(features, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/features_no_H2H.csv")
+
+# Head to head ---------------------------------------------------------------
+features_h2h <- read.csv("features_no_H2H.csv")
+features_h2h <- features_h2h[,-1]
+
+features_h2h <- cbind.data.frame(features_h2h, data[c(476,477)])
+colnames(features_h2h)[97:98] <- colnames(data)[c(476,477)]
+
+features_h2h$head_to_head_record <- ifelse(is.na(features_h2h$head_to_head_record), 50, features_h2h$head_to_head_record)
+features_h2h$head_to_head_record_court_surface <- ifelse(is.na(features_h2h$head_to_head_record_court_surface), 
+                                                         50, features_h2h$head_to_head_record_court_surface)
+
+write.csv(features_h2h, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/features_with_H2H.csv")
 
 # Testing using a tree -------------------------------------------------------
-ind <- 1:23658
+features <- bp_features
+ind <- 1:23656
+
+features$wl <- as.factor(features$wl)
+features$wl <- relevel(features$wl,"Player B")
 
 train_data <- features[ind, ]
 test_data <- features[-ind, ]
@@ -101,7 +172,7 @@ library(tree)
 #Super basic, default everything
 set.seed(2020)
 tree_tennis<- tree(as.formula(paste(colnames(features)[4], "~",
-                                    paste(colnames(features)[c(18,35)], collapse = "+"),
+                                    paste(colnames(features)[c(19:26, 30:37)], collapse = "+"),
                                     sep = "")), data = train_data, split = 'deviance')
 
 summary(tree_tennis) 
@@ -115,20 +186,20 @@ yhat<- predict(tree_tennis,  test_data, type = 'class')
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-#, control = tree.control(nobs=23658, mincut = 2, minsize = 4, mindev = 0.0001)
+
 
 # Testing Using a GLM --------------------------------------------------------
 set.seed(2020)
-#mod <- glm(as.formula(paste(colnames(features)[4], "~",
-#                            paste(colnames(features)[c(18,23)], collapse = "+"),
-#                            sep = "")), data = train_data, family = "binomial")
+mod <- glm(as.formula(paste(colnames(features)[4], "~",
+                            paste(colnames(features)[c(19:26, 30:37)], collapse = "+"),
+                            sep = "")), data = train_data, family = "binomial")
 
-mod <- glm(wl ~ servadv_overall_RA + BP_adv_overall_RA, data = train_data, family = 'binomial')
+#mod <- glm(wl ~ servadv_overall_RA + BP_adv_overall_RA, data = train_data, family = 'binomial')
 
 summary(mod)
 plot(sort(predict(mod, type = 'response')), type = "l")
 
-threshold <- 0.5875821
+threshold <- 0.588398  
 y.hat <- ifelse(predict(mod, newdata = test_data, type = 'response') > threshold, "Player A", "Player B") 
 
 y.hat[which(is.na(y.hat))]

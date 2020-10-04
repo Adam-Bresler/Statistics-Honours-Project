@@ -466,6 +466,13 @@ data$tournament_date <- lubridate::as_date(data$tournament_date)
 data <- data[-which(data$service_games_played == 0),]
 data <- data[-which(data$return_games_played == 0),]
 
+#data$break_points_serve_total_adjusted <- ifelse(data$break_points_serve_total == 0, 0.5, data$break_points_serve_total)
+#data$break_point_serve_feature <- (exp(data[,25])/exp(data[,26]))*(data[,27]/data[,225])
+
+#data$break_points_return_total_adjusted <- ifelse(data$break_points_return_total == 0, 0.1, data$break_points_return_total)
+#data$break_point_return_feature <- (exp(data[,33])/exp(data[,34]))*(data[,227]/data[,35]) # But actually this is inverted!
+# WE want consistency so both must have high as good
+
 data$BP_per_service_game  <- data[,26]/data[,27]
 data$BP_saved_per_faced   <- data[,25]/data[,26]
 
