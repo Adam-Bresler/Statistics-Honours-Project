@@ -7,7 +7,7 @@ library(stringr)
 library(tree)
 
 # Creating the predictive ----------------------------------------------------
-data <- read.csv("BP_serve_and_return.csv")
+data <- read.csv("BP_serve_and_return_seperated.csv")
 data <- data[,-1]
 
 #Eventually, add this into loop
@@ -24,11 +24,11 @@ predictive3 <- predictive[seq(1,52522,2),-c(57:236)]
 
 # Trying to merge them -------------------------------------------------------
 
-first_player<-predictive[seq(1,52522,2),]
-second_player<-predictive[seq(2,52522,2),]
+first_player<-predictive[seq(1,52518,2),]
+second_player<-predictive[seq(2,52518,2),]
 
-colnames(first_player)[c(5,15:236)] <- paste("Player_A", colnames(first_player[c(5,15:236)]), sep="_")
-colnames(second_player)[c(5,15:236)] <- paste("Player_B", colnames(second_player[c(5,15:236)]), sep="_")
+colnames(first_player)[c(5,15:244)] <- paste("Player_A", colnames(first_player[c(5,15:244)]), sep="_")
+colnames(second_player)[c(5,15:244)] <- paste("Player_B", colnames(second_player[c(5,15:244)]), sep="_")
 
 second_player <- second_player[, -c(1:4, 6:14)]
 
@@ -40,7 +40,7 @@ predictive_dataset$wl <- ifelse(predictive_dataset$wl == 'winner', "Player A", "
 
 predictive_dataset$wl <- as.factor(predictive_dataset$wl)
 
-predictive_dataset <- predictive_dataset[, c(1:5, 237, 6:236, 238:459)] #Watch out for this! Change as data changes
+predictive_dataset <- predictive_dataset[, c(1:5, 245, 6:244, 246:475)] #Watch out for this! Change as data changes
 
 # ----------------------------------------------------------------------------
 # first_player<-predictive2[seq(1,52522,2),-1]
@@ -78,7 +78,7 @@ predictive_dataset <- predictive_dataset[, c(1:5, 237, 6:236, 238:459)] #Watch o
 # 
 # rm(first_player,second_player)
 
-write.csv(predictive_dataset, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/BP_data_no_h2h.csv")
+write.csv(predictive_dataset, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/BP_seperated_data_no_h2h.csv")
 
 # Begin with feature design --------------------------------------------------
 

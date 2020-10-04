@@ -5,7 +5,7 @@ library(magrittr)
 library(caret)
 library(stats)
 
-data <- read.csv("BP_data_no_h2h.csv")
+data <- read.csv("BP_serve_and_return_seperated.csv")
 data <- data[,-1]
 data$wl <- as.factor(data$wl)
 data$wl <- relevel(data$wl,"Player B")
