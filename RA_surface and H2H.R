@@ -1,3 +1,9 @@
+library(dplyr)
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+library(caret)
+library(stats)
 
 # rolling average according to court surface ---------------------------------
 
@@ -64,7 +70,7 @@ average_past_games <- function(data, columns, months = 24){
 library(installr)
 
 
-data_H_2_H <-read.csv("final_data_no_H2H.csv")
+data_H_2_H <-read.csv("BP_seperated_data_no_H2H.csv")
 data_H_2_H <- data_H_2_H[,-1]
   
 # colnames(data_H_2_H)[c(57:98)] <- paste("rolling_average", colnames(data_H_2_H[15:56]), sep="_")
@@ -156,17 +162,17 @@ opponents <- unique(H_2_H$Player_B[ind])
 
 indices <- which(H_2_H$Player_A == "Rafael Nadal" & H_2_H$Player_B  == "Roger Federer" )
 
-H_2_H[indices,c(2,3,4,436)]
+H_2_H[indices,c(2,3,4,476)]
 
 
 indices2 <- which(H_2_H$Player_A  == "David Ferrer" & H_2_H$Player_B  == "Andy Murray" )
 
-H_2_H[indices2,c(2,3,4,436)]
+H_2_H[indices2,c(2,3,4,476)]
 
 
 indices_overall <- which(H_2_H$Player_A== "Rafael Nadal" & H_2_H$Player_B  == "Novak Djokovic" )
 
-H_2_H[indices_overall,c(2,3,4,436)]
+H_2_H[indices_overall,c(2,3,4,476)]
 
 length(which(is.na(H_2_H$head_to_head_record)))
 
@@ -229,7 +235,7 @@ for (i in unique(clay$Player_A)){
 
 indices_clay <- which(clay$Player_A == "Rafael Nadal" & clay$Player_B  == "Novak Djokovic" )
 
-clay[indices_clay,c(2,3,4,437)]
+clay[indices_clay,c(2,3,4,477)]
 
 # grass
 
@@ -274,7 +280,7 @@ for (i in unique(grass$Player_A)){
 
 indices_grass <- which(grass$Player_A == "Rafael Nadal" & grass$Player_B  == "Novak Djokovic" )
 
-grass[indices_grass,c(2,3,4,437)]
+grass[indices_grass,c(2,3,4,477)]
 
 # hard court
 
@@ -318,14 +324,14 @@ for (i in unique(hard_court$Player_A)){
 
 
 indices_hard_court <- which(hard_court$Player_A == "Rafael Nadal" & hard_court$Player_B  == "Novak Djokovic" )
-hard_court[indices_hard_court,c(2,3,4,437)]
+hard_court[indices_hard_court,c(2,3,4,477)]
 
 # combining and adding to overall data set 
 
 
-grass_H2H <- grass[,c(1,2,3,4,6,7,9,10,12,437)]
-clay_H2H <- clay[,c(1,2,3,4,6,7,9,10,12,437)]
-hard_court_H2H <- hard_court[,c(1,2,3,4,6,7,9,10,12,437)]
+grass_H2H <- grass[,c(1,2,3,4,6,7,9,10,12,477)]
+clay_H2H <- clay[,c(1,2,3,4,6,7,9,10,12,477)]
+hard_court_H2H <- hard_court[,c(1,2,3,4,6,7,9,10,12,477)]
 
 court_H2H <- rbind.data.frame(grass_H2H,clay_H2H,hard_court_H2H)
 
@@ -343,13 +349,15 @@ H_2_H$head_to_head_record_court_surface <- court_H2H$head_to_head_record_court_s
 
 indices <- which(H_2_H$Player_A == "Rafael Nadal" & H_2_H$Player_B  == "Novak Djokovic" )
 
-H_2_H[indices,c(2,4,13,436,437)]
+H_2_H[indices,c(2,4,13,476,477)]
 
 str(H_2_H$head_to_head_record)
 str(H_2_H$head_to_head_record_court_surface)
 
+length(which(is.na(H_2_H$head_to_head_record_court_surface)))
 
-# write.csv(H_2_H, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/final_predictive_data.csv")
+
+# write.csv(H_2_H, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/Data/BP_separated_with_H2H.csv")
 
 
 
