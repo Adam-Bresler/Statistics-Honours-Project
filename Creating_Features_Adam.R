@@ -144,6 +144,7 @@ colnames(features)[81:96] <- colnames(data)[c(85, 86, 127, 128, 169, 170, 211, 2
 
 #write.csv(features, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/features_no_H2H.csv")
 
+
 # Head to head ---------------------------------------------------------------
 features_h2h <- read.csv("features_no_H2H.csv")
 features_h2h <- features_h2h[,-1]
@@ -155,14 +156,40 @@ features_h2h$head_to_head_record <- ifelse(is.na(features_h2h$head_to_head_recor
 features_h2h$head_to_head_record_court_surface <- ifelse(is.na(features_h2h$head_to_head_record_court_surface), 
                                                          50, features_h2h$head_to_head_record_court_surface)
 
-write.csv(features_h2h, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/features_with_H2H.csv")
+#write.csv(features_h2h, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/features_with_H2H.csv")
 
-# Testing using a tree -------------------------------------------------------
-features <- bp_features
-ind <- 1:23656
+# Reading in the final features data set -------------------------------------
+features <- read.csv("features_with_H2H.csv")
+features <- features[, -1]
 
+# features <- features[,c(1:15, )]
+# 
+# #features <- features[,c(1:15, 19, 20, 38, 61, 64, 79, 80, 95:98)]
+# #features <- data[,c(1:15, 230:245, 460:475)]
+# 
+# hard <- features %>% filter(features$tournament_surface=="Hard")
+# clay <- features %>% filter(features$tournament_surface=="Clay")
+# grass <- features %>% filter(features$tournament_surface=="Grass")
+# 
+# # Testing using a tree -------------------------------------------------------
+# # Hard -----------------------------------------
+# features <- hard
+# ind <- 1:13494
+# 
+# # Clay -----------------------------------------
+# features <- clay
+# ind <- 1:7357
+# 
+# # Grass ----------------------------------------
+# features <- grass
+# ind <- 1:2886
+
+# Actual tree ----------------------------------------------------------------
 features$wl <- as.factor(features$wl)
 features$wl <- relevel(features$wl,"Player B")
+#features$wl <- make.names(features$wl)
+
+ind <- 1:23656
 
 train_data <- features[ind, ]
 test_data <- features[-ind, ]
@@ -172,8 +199,9 @@ library(tree)
 #Super basic, default everything
 set.seed(2020)
 tree_tennis<- tree(as.formula(paste(colnames(features)[4], "~",
-                                    paste(colnames(features)[c(19:26, 30:37)], collapse = "+"),
-                                    sep = "")), data = train_data, split = 'deviance')
+                                    paste(colnames(features)[c(5:6, 16:26)], collapse = "+"),
+                                    sep = "")), data = train_data, split = 'deviance', 
+                   control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
 
 summary(tree_tennis) 
 tree_tennis
@@ -186,42 +214,82 @@ yhat<- predict(tree_tennis,  test_data, type = 'class')
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
+# Prune that tree---------------------------------------
+cv.tennis <- cv.tree(tree_tennis, FUN=prune.misclass)
+# size = number of terminal nodes
+# k = alpha, the tuning parameter (large = fewer terminal nodes)
+# dev = cross validation error rate (in this case, not deviance, despite name)
+
+size <- cv.tennis$size
+plot(size, cv.tennis$dev, type = 'c', xlab = 'Number of terminal nodes', ylab = 'CV error')
+# add alpha values to the plot:
+cv.tennis$k[1] <- 0
+alpha <- round(cv.tennis$k,1)
+axis(3, at = size, lab = alpha, cex.axis = 0.8)
+mtext(expression(alpha), 3, line=2.5, cex=1.2)
+text(size, cv.tennis$dev, substitute(leaves, list(leaves = size)), cex = 0.9)
 
 
-# Testing Using a GLM --------------------------------------------------------
+# prune the tree back:
+prune.tennis <- prune.misclass(tree_tennis, best = 3)
+plot(prune.tennis)
+text(prune.tennis, pretty=0, cex=0.8)
+
+# how well does the pruned tree perform?
+tree.pred <- predict(prune.tennis, test_data, type='class')
+table(tree.pred, test_data$wl)
+sum(diag(table(tree.pred, test_data$wl)))/length(test_data$wl)*100
+
+
+
+# Testing using a Random Forest ----------------------------------------------
+library(randomForest)
+
 set.seed(2020)
-mod <- glm(as.formula(paste(colnames(features)[4], "~",
-                            paste(colnames(features)[c(19:26, 30:37)], collapse = "+"),
-                            sep = "")), data = train_data, family = "binomial")
+rf_tennis <- randomForest(as.formula(paste(colnames(features)[4], "~",
+                                           paste(colnames(features)[c(16:26)], collapse = "+"),
+                                           sep = "")), data = train_data, 
+                          ntree = 500, #no mtry argument, keep it defualt
+                          importance = TRUE, 
+                          do.trace = 10)
 
-#mod <- glm(wl ~ servadv_overall_RA + BP_adv_overall_RA, data = train_data, family = 'binomial')
+rf_tennis
 
-summary(mod)
-plot(sort(predict(mod, type = 'response')), type = "l")
+plot(rf_tennis$err.rate[, 'OOB'], type = 's', xlab = 'Number of trees', ylab = 'OOB error')
 
-threshold <- 0.588398  
-y.hat <- ifelse(predict(mod, newdata = test_data, type = 'response') > threshold, "Player A", "Player B") 
+rf_pred <- predict(rf_tennis, newdata = test_data) 
+table(rf_pred, test_data$wl)
+(rf_err <- mean(rf_pred != test_data$wl))
 
-y.hat[which(is.na(y.hat))]
-y.hat <- as.factor(y.hat)
-y.hat <- relevel(y.hat,"Player B")
-conf_matrix <- table(y.hat, test_data$wl)
-conf_matrix
+varImpPlot(rf_tennis, type = 2)
 
-sum(diag(conf_matrix))/sum(conf_matrix)
+# Random Forest in Ranger ----------------------------------------------------
 
-sens <- conf_matrix[2,2]/(conf_matrix[1,2]+conf_matrix[2,2])
-spec <- conf_matrix[1,1]/(conf_matrix[1,1]+conf_matrix[2,1])
+library(ranger)
 
-library(ROCR)
-prediction.object <- prediction(fitted(mod), labels = train_data$wl,label.ordering = c("Player B","Player A"))
+library(caret) 
 
-roc <-  performance(prediction.object,"tpr","fpr") 
-par(mfrow = c(1,1))
-plot(roc)
-abline(a = 0, b = 1) 
+set.seed(1234)
+cv_folds <- createFolds(train_data$wl, k = 5, returnTrain = TRUE)
 
-cutoffs <- data.frame(cut=roc@alpha.values[[1]], tpr=roc@y.values[[1]], spec = 1 - roc@x.values[[1]],
-                      fpr=roc@x.values[[1]])
-d <- cutoffs[,2] + cutoffs[,3]
-cutoffs[which.max(d),]
+ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
+rf_grid <- expand.grid(mtry = c(2:7),
+                      splitrule = 'gini',
+                      min.node.size = c(1:5))
+
+set.seed(2020)
+rf_tennis <- train(as.formula(paste(colnames(features)[4], "~",
+                                     paste(colnames(features)[c(5:6, 16:26)], collapse = "+"),
+                                     sep = "")), data = train_data, 
+                    method = 'ranger',
+                    num.trees = 250, 
+                    trControl = ctrl, 
+                    verbose = F, 
+                    tuneGrid = rf_grid)
+
+rf_pred <- predict(rf_tennis, test_data)
+rf_cf <- confusionMatrix(rf_pred, test_data$wl)
+sum(diag(rf_cf$table))/sum(rf_cf$table)
+
+
+
