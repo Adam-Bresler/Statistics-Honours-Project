@@ -157,49 +157,51 @@ features_h2h$head_to_head_record_court_surface <- ifelse(is.na(features_h2h$head
 
 write.csv(features_h2h, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/features_with_H2H.csv")
 
-# Testing using a tree -------------------------------------------------------
-features <- bp_features
+
+# 0.6142684 when removing NA's for H2H by court....
+
+# Playing around with features -----------------------------------------------
+
+features <- read.csv("features_with_H2H.csv")
+# features <- read.csv("BP_separated_with_H2H.csv")
+features <- features[,-1]
+
+
 ind <- 1:23656
 
 features$wl <- as.factor(features$wl)
 features$wl <- relevel(features$wl,"Player B")
 
+#features <- na.omit(features)
 train_data <- features[ind, ]
+#train_data <- na.omit(train_data)
 test_data <- features[-ind, ]
-
-library(tree)
-
-#Super basic, default everything
-set.seed(2020)
-tree_tennis<- tree(as.formula(paste(colnames(features)[4], "~",
-                                    paste(colnames(features)[c(19:26, 30:37)], collapse = "+"),
-                                    sep = "")), data = train_data, split = 'deviance')
-
-summary(tree_tennis) 
-tree_tennis
-plot(tree_tennis)
-text(tree_tennis, cex = 0.9)
-
-yhat<- predict(tree_tennis,  test_data, type = 'class')
-
-(c_mat <- table(yhat, test_data$wl))          
-sum(diag(c_mat))/nrow(test_data)*100                
-1 - sum(diag(c_mat))/nrow(test_data)
+#test_data <- na.omit(test_data)
 
 
+# stratification by court surface --------------------------------------------
+
+train_clay <-train_data[which(train_data$tournament_surface=="Clay"),] 
+test_clay <- test_data[which(test_data$tournament_surface=="Clay"),]
+
+train_grass <-train_data[which(train_data$tournament_surface=="Grass"),] 
+test_grass <- test_data[which(test_data$tournament_surface=="Grass"),]
+
+train_hard_court <-train_data[which(train_data$tournament_surface=="Hard"),] 
+test_hard_court <- test_data[which(test_data$tournament_surface=="Hard"),]
+
+# column 38
 
 # Testing Using a GLM --------------------------------------------------------
-set.seed(2020)
-mod <- glm(as.formula(paste(colnames(features)[4], "~",
-                            paste(colnames(features)[c(19:26, 30:37)], collapse = "+"),
-                            sep = "")), data = train_data, family = "binomial")
 
-#mod <- glm(wl ~ servadv_overall_RA + BP_adv_overall_RA, data = train_data, family = 'binomial')
+mod <- glm(as.formula(paste(colnames(features)[4], "~",
+                            paste(colnames(features)[c(16:98)], collapse = "+"),
+                            sep = "")), data = train_data, family = "binomial")
 
 summary(mod)
 plot(sort(predict(mod, type = 'response')), type = "l")
 
-threshold <- 0.588398  
+threshold <- 0.6186408
 y.hat <- ifelse(predict(mod, newdata = test_data, type = 'response') > threshold, "Player A", "Player B") 
 
 y.hat[which(is.na(y.hat))]
@@ -225,3 +227,354 @@ cutoffs <- data.frame(cut=roc@alpha.values[[1]], tpr=roc@y.values[[1]], spec = 1
                       fpr=roc@x.values[[1]])
 d <- cutoffs[,2] + cutoffs[,3]
 cutoffs[which.max(d),]
+
+
+# Boosting -------------------------------------------------------------------
+library(gbm)
+
+ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
+gbm_grid <- expand.grid(n.trees = c(500, 1000),
+                        interaction.depth = c(1,2,5),
+                        shrinkage = c(0.1, 0.01,0.001),
+                        n.minobsinnode = 1)
+set.seed(2020)
+gbm_tennis <- train(as.formula(paste(colnames(features)[4], "~",
+                                     paste(colnames(features)[c(16:98)], collapse = "+"),
+                                     sep = "")), data = train_data, 
+                    method = 'gbm', 
+                    distribution = 'bernoulli', 
+                    trControl = ctrl, 
+                    verbose = F, 
+                    tuneGrid = gbm_grid)
+
+gbm_pred <- predict(gbm_tennis, test_data)
+gbm_cf <- confusionMatrix(gbm_pred, test_data$wl)
+sum(diag(gbm_cf$table))/sum(gbm_cf$table)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# grass
+mod <- glm(as.formula(paste(colnames(features)[4], "~",
+                            paste(colnames(features)[c(38,61,64,71,79)], collapse = "+"),
+                            sep = "")), data = train_grass, family = "binomial")
+
+summary(mod)
+plot(sort(predict(mod, type = 'response')), type = "l")
+
+threshold <- 0.55
+y.hat <- ifelse(predict(mod, newdata = test_grass, type = 'response') > threshold, "Player A", "Player B") 
+
+y.hat[which(is.na(y.hat))]
+y.hat <- as.factor(y.hat)
+y.hat <- relevel(y.hat,"Player B")
+conf_matrix <- table(y.hat, test_grass$wl)
+conf_matrix
+
+sum(diag(conf_matrix))/sum(conf_matrix)
+
+sens <- conf_matrix[2,2]/(conf_matrix[1,2]+conf_matrix[2,2])
+spec <- conf_matrix[1,1]/(conf_matrix[1,1]+conf_matrix[2,1])
+
+library(ROCR)
+prediction.object <- prediction(fitted(mod), labels = train_grass$wl,label.ordering = c("Player B","Player A"))
+
+roc <-  performance(prediction.object,"tpr","fpr") 
+par(mfrow = c(1,1))
+plot(roc)
+abline(a = 0, b = 1) 
+
+cutoffs <- data.frame(cut=roc@alpha.values[[1]], tpr=roc@y.values[[1]], spec = 1 - roc@x.values[[1]],
+                      fpr=roc@x.values[[1]])
+d <- cutoffs[,2] + cutoffs[,3]
+cutoffs[which.max(d),]
+
+
+# hard court
+mod <- glm(as.formula(paste(colnames(features)[4], "~",
+                            paste(colnames(features)[c(38,61,64,71,79)], collapse = "+"),
+                            sep = "")), data = train_hard_court, family = "binomial")
+
+summary(mod)
+plot(sort(predict(mod, type = 'response')), type = "l")
+
+threshold <- 0.52
+y.hat <- ifelse(predict(mod, newdata = test_hard_court, type = 'response') > threshold, "Player A", "Player B") 
+
+y.hat[which(is.na(y.hat))]
+y.hat <- as.factor(y.hat)
+y.hat <- relevel(y.hat,"Player B")
+conf_matrix <- table(y.hat, test_hard_court$wl)
+conf_matrix
+
+sum(diag(conf_matrix))/sum(conf_matrix)
+
+sens <- conf_matrix[2,2]/(conf_matrix[1,2]+conf_matrix[2,2])
+spec <- conf_matrix[1,1]/(conf_matrix[1,1]+conf_matrix[2,1])
+
+library(ROCR)
+prediction.object <- prediction(fitted(mod), labels = train_hard_court$wl,label.ordering = c("Player B","Player A"))
+
+roc <-  performance(prediction.object,"tpr","fpr") 
+par(mfrow = c(1,1))
+plot(roc)
+abline(a = 0, b = 1) 
+
+cutoffs <- data.frame(cut=roc@alpha.values[[1]], tpr=roc@y.values[[1]], spec = 1 - roc@x.values[[1]],
+                      fpr=roc@x.values[[1]])
+d <- cutoffs[,2] + cutoffs[,3]
+cutoffs[which.max(d),]
+
+
+# clay
+mod <- glm(as.formula(paste(colnames(features)[4], "~",
+                            paste(colnames(features)[c(38,61,64,71,79)], collapse = "+"),
+                            sep = "")), data = train_clay, family = "binomial")
+
+summary(mod)
+plot(sort(predict(mod, type = 'response')), type = "l")
+
+threshold <- 0.55 
+y.hat <- ifelse(predict(mod, newdata = test_clay, type = 'response') > threshold, "Player A", "Player B") 
+
+y.hat[which(is.na(y.hat))]
+y.hat <- as.factor(y.hat)
+y.hat <- relevel(y.hat,"Player B")
+conf_matrix <- table(y.hat, test_clay$wl)
+conf_matrix
+
+sum(diag(conf_matrix))/sum(conf_matrix)
+
+sens <- conf_matrix[2,2]/(conf_matrix[1,2]+conf_matrix[2,2])
+spec <- conf_matrix[1,1]/(conf_matrix[1,1]+conf_matrix[2,1])
+
+library(ROCR)
+prediction.object <- prediction(fitted(mod), labels = train_clay$wl,label.ordering = c("Player B","Player A"))
+
+roc <-  performance(prediction.object,"tpr","fpr") 
+par(mfrow = c(1,1))
+plot(roc)
+abline(a = 0, b = 1) 
+
+cutoffs <- data.frame(cut=roc@alpha.values[[1]], tpr=roc@y.values[[1]], spec = 1 - roc@x.values[[1]],
+                      fpr=roc@x.values[[1]])
+d <- cutoffs[,2] + cutoffs[,3]
+cutoffs[which.max(d),]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# gbm grass
+library(gbm)
+
+ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
+gbm_grid <- expand.grid(n.trees = c(500, 1000),
+                        interaction.depth = c(1,2,3,4,5),
+                        shrinkage = c(0.1, 0.01,0.001),
+                        n.minobsinnode = 1)
+set.seed(2020)
+gbm_tennis <- train(as.formula(paste(colnames(features)[4], "~",
+                                     paste(colnames(features)[c(38,61,64,71,79)], collapse = "+"),
+                                     sep = "")), data = train_grass, 
+                    method = 'gbm', 
+                    distribution = 'bernoulli', 
+                    trControl = ctrl, 
+                    verbose = F, 
+                    tuneGrid = gbm_grid)
+
+gbm_pred <- predict(gbm_tennis, test_grass)
+gbm_cf <- confusionMatrix(gbm_pred, test_grass$wl)
+sum(diag(gbm_cf$table))/sum(gbm_cf$table)
+
+
+# gbm hard court
+library(gbm)
+
+ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
+gbm_grid <- expand.grid(n.trees = c(500, 1000),
+                        interaction.depth = c(1,2,3,4,5),
+                        shrinkage = c(0.1, 0.01,0.001),
+                        n.minobsinnode = 1)
+set.seed(2020)
+gbm_tennis <- train(as.formula(paste(colnames(features)[4], "~",
+                                     paste(colnames(features)[c(38,61,64,71,79)], collapse = "+"),
+                                     sep = "")), data = train_hard_court, 
+                    method = 'gbm', 
+                    distribution = 'bernoulli', 
+                    trControl = ctrl, 
+                    verbose = F, 
+                    tuneGrid = gbm_grid)
+
+gbm_pred <- predict(gbm_tennis, test_hard_court)
+gbm_cf <- confusionMatrix(gbm_pred, test_hard_court$wl)
+sum(diag(gbm_cf$table))/sum(gbm_cf$table)
+
+
+# gbm clay
+library(gbm)
+
+ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
+gbm_grid <- expand.grid(n.trees = c(500, 1000),
+                        interaction.depth = c(1,2,3,4,5),
+                        shrinkage = c(0.1, 0.01,0.001),
+                        n.minobsinnode = 1)
+set.seed(2020)
+gbm_tennis <- train(as.formula(paste(colnames(features)[4], "~",
+                                     paste(colnames(features)[c(38,61,64,71,79)], collapse = "+"),
+                                     sep = "")), data = train_clay, 
+                    method = 'gbm', 
+                    distribution = 'bernoulli', 
+                    trControl = ctrl, 
+                    verbose = F, 
+                    tuneGrid = gbm_grid)
+
+gbm_pred <- predict(gbm_tennis, test_clay)
+gbm_cf <- confusionMatrix(gbm_pred, test_clay$wl)
+sum(diag(gbm_cf$table))/sum(gbm_cf$table)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Run with all the raw features
+
+data <- read.csv("BP_separated_with_H2H.csv")
+data <- data[,-1]
+data$wl <- as.factor(data$wl)
+data$wl <- relevel(data$wl,"Player B")
+
+data$head_to_head_record <- ifelse(is.na(data$head_to_head_record), 50, data$head_to_head_record)
+data$head_to_head_record_court_surface <- ifelse(is.na(data$head_to_head_record_court_surface), 
+                                                         50, data$head_to_head_record_court_surface)
+
+ind <- 1:23656
+
+#features <- na.omit(features)
+train_data2 <- data[ind, ]
+test_data2 <- data[-ind, ]
+
+# Testing Using a GLM --------------------------------------------------------
+
+mod <- glm(as.formula(paste(colnames(data)[4], "~",
+                            paste(colnames(data)[c(5,6,58:225,288:455)], collapse = "+"),
+                            sep = "")), data = train_data2, family = "binomial")
+
+summary(mod)
+plot(sort(predict(mod, type = 'response')), type = "l")
+
+threshold <- 0.5804463
+y.hat <- ifelse(predict(mod, newdata = test_data2, type = 'response') > threshold, "Player A", "Player B") 
+
+y.hat[which(is.na(y.hat))]
+y.hat <- as.factor(y.hat)
+y.hat <- relevel(y.hat,"Player B")
+conf_matrix <- table(y.hat, test_data2$wl)
+conf_matrix
+
+sum(diag(conf_matrix))/sum(conf_matrix)
+
+sens <- conf_matrix[2,2]/(conf_matrix[1,2]+conf_matrix[2,2])
+spec <- conf_matrix[1,1]/(conf_matrix[1,1]+conf_matrix[2,1])
+
+library(ROCR)
+prediction.object <- prediction(fitted(mod), labels = train_data2$wl,label.ordering = c("Player B","Player A"))
+
+roc <-  performance(prediction.object,"tpr","fpr") 
+par(mfrow = c(1,1))
+plot(roc)
+abline(a = 0, b = 1) 
+
+cutoffs <- data.frame(cut=roc@alpha.values[[1]], tpr=roc@y.values[[1]], spec = 1 - roc@x.values[[1]],
+                      fpr=roc@x.values[[1]])
+d <- cutoffs[,2] + cutoffs[,3]
+cutoffs[which.max(d),]
+
+
+# Boosting -------------------------------------------------------------------
+library(gbm)
+
+ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
+gbm_grid <- expand.grid(n.trees = c(500),
+                        interaction.depth = c(1,2),
+                        shrinkage = c(0.01),
+                        n.minobsinnode = 1)
+set.seed(2020)
+gbm_tennis <- train(as.formula(paste(colnames(data)[4], "~",
+                                     paste(colnames(data)[c(5,6,58:225,288:455)], collapse = "+"),
+                                     sep = "")), data = train_data2, 
+                    method = 'gbm', 
+                    distribution = 'bernoulli', 
+                    trControl = ctrl, 
+                    verbose = F, 
+                    tuneGrid = gbm_grid)
+
+
+
+gbm_pred <- predict(gbm_tennis, test_data2)
+gbm_cf <- confusionMatrix(gbm_pred, test_data2$wl)
+sum(diag(gbm_cf$table))/sum(gbm_cf$table)
+
+
+
+
