@@ -11,7 +11,7 @@ library(randomForest)
 ctrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
 rf_grid <- expand.grid(mtry = c(2:7),
                        splitrule = 'gini',
-                       min.node.size = c(1:5))
+                       min.node.size = c(1,3,5,10))
 
 # Using the raw data ---------------------------------------------------------
 # raw rolled -----------------------------------
@@ -19,10 +19,6 @@ data <- read.csv("raw_rolled.csv")
 data <- data[,-1]
 data$wl <- as.factor(data$wl)
 data$wl <- relevel(data$wl,"Player B") 
-
-data$head_to_head_record <- ifelse(is.na(data$head_to_head_record), 50, data$head_to_head_record)
-data$head_to_head_record_court_surface <- ifelse(is.na(data$head_to_head_record_court_surface), 
-                                                 50, data$head_to_head_record_court_surface)
 
 ind <- 1:23656
 
@@ -71,10 +67,6 @@ data <- data[,-1]
 data$wl <- as.factor(data$wl)
 data$wl <- relevel(data$wl,"Player B") 
 
-data$head_to_head_record <- ifelse(is.na(data$head_to_head_record), 50, data$head_to_head_record)
-data$head_to_head_record_court_surface <- ifelse(is.na(data$head_to_head_record_court_surface), 
-                                                 50, data$head_to_head_record_court_surface)
-
 ind <- 1:23656
 
 train_data <- data[ind, ]
@@ -82,7 +74,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 rf_tennis_raw_rolled_bc <- randomForest(as.formula(paste(colnames(data)[4], "~",
-                                                         paste(colnames(data)[c(5:6, 58:225, 288:455)], collapse = "+"),
+                                                         paste(colnames(data)[c(5:6, 16:75)], collapse = "+"),
                                                          sep = "")), data = train_data, 
                                         ntree = 500, #no mtry argument, keep it default
                                         importance = TRUE, 
@@ -122,9 +114,6 @@ data <- data[,-1]
 data$wl <- as.factor(data$wl)
 data$wl <- relevel(data$wl,"Player B") 
 
-data$head_to_head_record <- ifelse(is.na(data$head_to_head_record), 50, data$head_to_head_record)
-data$head_to_head_record_court_surface <- ifelse(is.na(data$head_to_head_record_court_surface), 
-                                                 50, data$head_to_head_record_court_surface)
 
 ind <- 1:23656
 
@@ -172,10 +161,6 @@ data <- data[,-1]
 data$wl <- as.factor(data$wl)
 data$wl <- relevel(data$wl,"Player B") 
 
-data$head_to_head_record <- ifelse(is.na(data$head_to_head_record), 50, data$head_to_head_record)
-data$head_to_head_record_court_surface <- ifelse(is.na(data$head_to_head_record_court_surface), 
-                                                 50, data$head_to_head_record_court_surface)
-
 ind <- 1:23656
 
 train_data <- data[ind, ]
@@ -216,7 +201,6 @@ rf_caret_tennis_raw_weighted_bc <- train(as.formula(paste(colnames(data)[4], "~"
 rf_caret_pred_raw_weighted_bc <- predict(rf_caret_tennis_raw_weighted_bc, test_data)
 rf_caref_cf_raw_weighted_bc <- confusionMatrix(rf_caret_pred_raw_weighted_bc, test_data$wl)
 sum(diag(rf_caref_cf_raw_weighted_bc$table))/sum(rf_caref_cf_raw_weighted_bc$table)
-
 
 
 # Using the engineered data --------------------------------------------------------
