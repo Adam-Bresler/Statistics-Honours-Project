@@ -228,7 +228,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 tree_tennis_engineered_rolled <- tree(as.formula(paste(colnames(data)[4], "~",
-                                                paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                 sep = "")), data = train_data, split = 'deviance', 
                                control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
 
@@ -279,7 +279,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 tree_tennis_engineered_rolled_bc <- tree(as.formula(paste(colnames(data)[4], "~",
-                                                   paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                   paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                    sep = "")), data = train_data, split = 'deviance', 
                                   control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
 
@@ -332,7 +332,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 tree_tennis_engineered_weighted <- tree(as.formula(paste(colnames(data)[4], "~",
-                                                  paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                  paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                   sep = "")), data = train_data, split = 'deviance', 
                                  control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
 
@@ -383,7 +383,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 tree_tennis_engineered_weighted_bc <- tree(as.formula(paste(colnames(data)[4], "~",
-                                                     paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                     paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                      sep = "")), data = train_data, split = 'deviance', 
                                     control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
 
@@ -421,37 +421,6 @@ tree.pred_engineered_weighted_bc <- predict(prune.tennis_engineered_weighted_bc,
 table(tree.pred_engineered_weighted_bc, test_data$wl)
 sum(diag(table(tree.pred_engineered_weighted_bc, test_data$wl)))/length(test_data$wl)*100
 
-
-
-# TESTING ---------------------
-data <- read.csv("raw_rolled.csv")
-data <- data[,-1]
-data$wl <- as.factor(data$wl)
-data$wl <- relevel(data$wl,"Player B") 
-
-data <- data[-c(1:5000),]
-
-ind <- 1:18656
-
-train_data <- data[ind, ]
-test_data <- data[-ind, ]
-
-set.seed(2020)
-tree_tennis_raw_rolled <- tree(as.formula(paste(colnames(data)[4], "~",
-                                                paste(colnames(data)[c(5:6, 16:71)], collapse = "+"),
-                                                sep = "")), data = train_data, split = 'deviance', 
-                               control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
-
-summary(tree_tennis_raw_rolled) 
-tree_tennis_raw_rolled
-plot(tree_tennis_raw_rolled)
-text(tree_tennis_raw_rolled, cex = 0.9)
-
-yhat_data <- predict(tree_tennis_raw_rolled,  test_data, type = 'class')
-
-(c_mat <- table(yhat_data, test_data$wl))          
-sum(diag(c_mat))/nrow(test_data)*100                
-1 - sum(diag(c_mat))/nrow(test_data)
 
 
 
