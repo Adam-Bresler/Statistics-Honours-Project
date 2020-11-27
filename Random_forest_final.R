@@ -54,7 +54,8 @@ rf_caret_tennis_raw_rolled <- train(as.formula(paste(colnames(data)[4], "~",
                                     num.trees = 350,
                                     trControl = ctrl,
                                     verbose = F,
-                                    tuneGrid = rf_grid)
+                                    tuneGrid = rf_grid,
+                                    importance = 'impurity')
 
 rf_caret_pred_raw_rolled <- predict(rf_caret_tennis_raw_rolled, test_data)
 rf_caref_cf_raw_rolled <- confusionMatrix(rf_caret_pred_raw_rolled, test_data$wl)
@@ -101,7 +102,8 @@ rf_caret_tennis_raw_rolled_bc <- train(as.formula(paste(colnames(data)[4], "~",
                                     num.trees = 350,
                                     trControl = ctrl,
                                     verbose = F,
-                                    tuneGrid = rf_grid)
+                                    tuneGrid = rf_grid,
+                                    importance = 'impurity')
 
 rf_caret_pred_raw_rolled_bc <- predict(rf_caret_tennis_raw_rolled_bc, test_data)
 rf_caref_cf_raw_rolled_bc <- confusionMatrix(rf_caret_pred_raw_rolled_bc, test_data$wl)
@@ -149,7 +151,8 @@ rf_caret_tennis_raw_weighted <- train(as.formula(paste(colnames(data)[4], "~",
                                          num.trees = 350,
                                          trControl = ctrl,
                                          verbose = F,
-                                         tuneGrid = rf_grid)
+                                         tuneGrid = rf_grid,
+                                         importance = 'impurity')
 
 rf_caret_pred_raw_weighted <- predict(rf_caret_tennis_raw_weighted, test_data)
 rf_caref_cf_raw_weighted <- confusionMatrix(rf_caret_pred_raw_weighted, test_data$wl)
@@ -196,7 +199,8 @@ rf_caret_tennis_raw_weighted_bc <- train(as.formula(paste(colnames(data)[4], "~"
                                        num.trees = 350,
                                        trControl = ctrl,
                                        verbose = F,
-                                       tuneGrid = rf_grid)
+                                       tuneGrid = rf_grid,
+                                       importance = 'impurity')
 
 rf_caret_pred_raw_weighted_bc <- predict(rf_caret_tennis_raw_weighted_bc, test_data)
 rf_caref_cf_raw_weighted_bc <- confusionMatrix(rf_caret_pred_raw_weighted_bc, test_data$wl)
@@ -248,7 +252,8 @@ rf_caret_tennis_engineered_rolled <- train(as.formula(paste(colnames(data)[4], "
                                     num.trees = 350,
                                     trControl = ctrl,
                                     verbose = F,
-                                    tuneGrid = rf_grid)
+                                    tuneGrid = rf_grid,
+                                    importance = 'impurity')
 
 rf_caret_pred_engineered_rolled <- predict(rf_caret_tennis_engineered_rolled, test_data)
 rf_caref_cf_engineered_rolled <- confusionMatrix(rf_caret_pred_engineered_rolled, test_data$wl)
@@ -298,7 +303,8 @@ rf_caret_tennis_engineered_rolled_bc <- train(as.formula(paste(colnames(data)[4]
                                        num.trees = 350,
                                        trControl = ctrl,
                                        verbose = F,
-                                       tuneGrid = rf_grid)
+                                       tuneGrid = rf_grid,
+                                       importance = 'impurity')
 
 rf_caret_pred_engineered_rolled_bc <- predict(rf_caret_tennis_engineered_rolled_bc, test_data)
 rf_caref_cf_engineered_rolled_bc <- confusionMatrix(rf_caret_pred_engineered_rolled_bc, test_data$wl)
@@ -348,11 +354,14 @@ rf_caret_tennis_engineered_weighted <- train(as.formula(paste(colnames(data)[4],
                                       num.trees = 350,
                                       trControl = ctrl,
                                       verbose = F,
-                                      tuneGrid = rf_grid)
+                                      tuneGrid = rf_grid,
+                                      importance = 'impurity')
 
 rf_caret_pred_engineered_weighted <- predict(rf_caret_tennis_engineered_weighted, test_data)
 rf_caref_cf_engineered_weighted <- confusionMatrix(rf_caret_pred_engineered_weighted, test_data$wl)
 sum(diag(rf_caref_cf_engineered_weighted$table))/sum(rf_caref_cf_engineered_weighted$table)
+
+
 
 # engineered weighted BC --------------------------------
 data <- read.csv("engineered_weighted_bc.csv")
@@ -398,7 +407,8 @@ rf_caret_tennis_engineered_weighted_bc <- train(as.formula(paste(colnames(data)[
                                          num.trees = 350,
                                          trControl = ctrl,
                                          verbose = F,
-                                         tuneGrid = rf_grid)
+                                         tuneGrid = rf_grid,
+                                         importance = 'impurity')
 
 rf_caret_pred_engineered_weighted_bc <- predict(rf_caret_tennis_engineered_weighted_bc, test_data)
 rf_caref_cf_engineered_weighted_bc <- confusionMatrix(rf_caret_pred_engineered_weighted_bc, test_data$wl)
@@ -424,4 +434,29 @@ legend("topright", legend=c("Historical Average", "Historical Average By Court",
                             "Time Discounted Historical Average", "Time Discounted Historical Average By Court"),
        fill=c("green4", "violetred1", "green", "goldenrod1"))
 dev.off()
+
+
+plot(varImp(rf_caret_tennis_engineered_weighted))
+
+
+
+test <- as.data.frame(varImp(rf_caret_tennis_engineered_weighted)$importance)
+rownames(test) <- c("Player A seed"                                            ,  "Player_B_seed"  ,                                           
+                    "Player_A_weighted_rolling_average_BP_per_service_game"    ,  "Player_A_weighted_rolling_average_BP_saved_per_faced" ,     
+                    "Player_A_weighted_rolling_average_BP_per_return_game"    ,   "Player_A_weighted_rolling_average_BP_converted_per_created",
+                    "Player_B_weighted_rolling_average_BP_per_service_game"    ,  "Player_B_weighted_rolling_average_BP_saved_per_faced"      ,
+                    "Player_B_weighted_rolling_average_BP_per_return_game"      , "Player_B_weighted_rolling_average_BP_converted_per_created",
+                    "seeding_diff"                                              , "Weighted_RA_duration_diff"                             ,    
+                    "servadv_Player_A_Weighted_RA"                              , "servadv_Player_B_Weighted_RA"               ,               
+                    "servadv_overall_Weighted_RA"                               , "completeness_Player_A_Weighted_RA"          ,               
+                    "completeness_Player_B_Weighted_RA"                         , "BP_conversion_adv_Player_A_weighted_RA",
+                    "BP_conversion_adv_Player_B_weighted_RA"                    , "BP_conversion_adv_overall_weighted_RA"       ,              
+                    "BP_frequency_adv_Player_A_weighted_RA"                     , "BP_frequency_adv_Player_B_weighted_RA"       ,              
+                    "BP_frequency_adv_overall_weighted_RA"                      , "Player_A_weighted_rolling_average_aces_percentage" ,        
+                    "Player_A_weighted_rolling_average_dbl_fault_percentage"    , "Player_B_weighted_rolling_average_aces_percentage"  ,       
+                    "Player_B_weighted_rolling_average_dbl_fault_percentage"    , "head_to_head_record"                     )
+
+
+rownames(varImp(rf_caret_tennis_engineered_weighted)$importance)
+
 
