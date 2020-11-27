@@ -411,7 +411,7 @@ lines(rf_tennis_raw_weighted$err.rate[, 'OOB'], type = 's', col = "cyan2")
 lines(rf_tennis_raw_weighted_bc$err.rate[, 'OOB'], type = 's', col = "deepskyblue1")
 legend("topright", legend=c("Historical Average", "Historical Average By Court", 
                             "Time Discounted Historical Average", "Time Discounted Historical Average By Court"),
-       col=c("blue4", "blueviolet", "cyan2", "deepskyblue1"), lty = c(1,1,1,1),cex=0.8, lwd = c(3,3,3,3))
+       fill=c("blue4", "blueviolet", "cyan2", "deepskyblue1"))
 dev.off()
 
 dev.new()
