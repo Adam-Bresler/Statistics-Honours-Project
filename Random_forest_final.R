@@ -225,7 +225,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 rf_tennis_engineered_rolled <- randomForest(as.formula(paste(colnames(data)[4], "~",
-                                                             paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                             paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                              sep = "")), data = train_data, 
                                             ntree = 500, #no mtry argument, keep it default
                                             importance = TRUE, 
@@ -246,7 +246,7 @@ set.seed(2020)
 cv_folds <- createFolds(train_data$wl, k = 5, returnTrain = TRUE)
 
 rf_caret_tennis_engineered_rolled <- train(as.formula(paste(colnames(data)[4], "~",
-                                                     paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                     paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                      sep = "")), data = train_data,
                                     method = 'ranger',
                                     num.trees = 350,
@@ -276,7 +276,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 rf_tennis_engineered_rolled_bc <- randomForest(as.formula(paste(colnames(data)[4], "~",
-                                                                paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                                paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                                 sep = "")), data = train_data, 
                                                ntree = 500, #no mtry argument, keep it default
                                                importance = TRUE, 
@@ -297,7 +297,7 @@ set.seed(2020)
 cv_folds <- createFolds(train_data$wl, k = 5, returnTrain = TRUE)
 
 rf_caret_tennis_engineered_rolled_bc <- train(as.formula(paste(colnames(data)[4], "~",
-                                                        paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                        paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                         sep = "")), data = train_data,
                                        method = 'ranger',
                                        num.trees = 350,
@@ -327,7 +327,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 rf_tennis_engineered_weighted <- randomForest(as.formula(paste(colnames(data)[4], "~",
-                                                               paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                               paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                                sep = "")), data = train_data, 
                                               ntree = 500, #no mtry argument, keep it default
                                               importance = TRUE, 
@@ -348,7 +348,7 @@ set.seed(2020)
 cv_folds <- createFolds(train_data$wl, k = 5, returnTrain = TRUE)
 
 rf_caret_tennis_engineered_weighted <- train(as.formula(paste(colnames(data)[4], "~",
-                                                       paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                       paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                        sep = "")), data = train_data,
                                       method = 'ranger',
                                       num.trees = 350,
@@ -380,7 +380,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 rf_tennis_engineered_weighted_bc <- randomForest(as.formula(paste(colnames(data)[4], "~",
-                                                                  paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                                  paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                                   sep = "")), data = train_data, 
                                                  ntree = 500, #no mtry argument, keep it default
                                                  importance = TRUE, 
@@ -401,7 +401,7 @@ set.seed(2020)
 cv_folds <- createFolds(train_data$wl, k = 5, returnTrain = TRUE)
 
 rf_caret_tennis_engineered_weighted_bc <- train(as.formula(paste(colnames(data)[4], "~",
-                                                          paste(colnames(data)[c(5:6, 16:41)], collapse = "+"),
+                                                          paste(colnames(data)[c(5:6, 16:39)], collapse = "+"),
                                                           sep = "")), data = train_data,
                                          method = 'ranger',
                                          num.trees = 350,
@@ -414,7 +414,7 @@ rf_caret_pred_engineered_weighted_bc <- predict(rf_caret_tennis_engineered_weigh
 rf_caref_cf_engineered_weighted_bc <- confusionMatrix(rf_caret_pred_engineered_weighted_bc, test_data$wl)
 sum(diag(rf_caref_cf_engineered_weighted_bc$table))/sum(rf_caref_cf_engineered_weighted_bc$table)
 
-dev.new()
+
 plot(rf_tennis_raw_rolled$err.rate[, 'OOB'], type = 's', xlab = 'Number of trees', ylab = 'OOB error', col = "blue4")
 lines(rf_tennis_raw_rolled_bc$err.rate[, 'OOB'], type = 's', col = "blueviolet")
 lines(rf_tennis_raw_weighted$err.rate[, 'OOB'], type = 's', col = "cyan2")
@@ -422,9 +422,8 @@ lines(rf_tennis_raw_weighted_bc$err.rate[, 'OOB'], type = 's', col = "deepskyblu
 legend("topright", legend=c("Historical Average", "Historical Average By Court", 
                             "Time Discounted Historical Average", "Time Discounted Historical Average By Court"),
        fill=c("blue4", "blueviolet", "cyan2", "deepskyblue1"))
-dev.off()
 
-dev.new()
+
 plot(rf_tennis_engineered_rolled$err.rate[, 'OOB'], type = 's', xlab = 'Number of trees', 
      ylab = 'OOB error', col = "green4", ylim = c(0.33,0.43))
 lines(rf_tennis_engineered_rolled_bc$err.rate[, 'OOB'], type = 's', col = "violetred1")
@@ -433,30 +432,17 @@ lines(rf_tennis_engineered_weighted_bc$err.rate[, 'OOB'], type = 's', col = "gol
 legend("topright", legend=c("Historical Average", "Historical Average By Court", 
                             "Time Discounted Historical Average", "Time Discounted Historical Average By Court"),
        fill=c("green4", "violetred1", "green", "goldenrod1"))
-dev.off()
 
 
+
+plot(varImp(rf_caret_tennis_raw_rolled))
+plot(varImp(rf_caret_tennis_raw_rolled_bc))
+plot(varImp(rf_caret_tennis_raw_weighted))
+plot(varImp(rf_caret_tennis_raw_weighted_bc))
+
+plot(varImp(rf_caret_tennis_engineered_rolled))
+plot(varImp(rf_caret_tennis_engineered_rolled_bc))
 plot(varImp(rf_caret_tennis_engineered_weighted))
-
-
-
-test <- as.data.frame(varImp(rf_caret_tennis_engineered_weighted)$importance)
-rownames(test) <- c("Player A seed"                                            ,  "Player_B_seed"  ,                                           
-                    "Player_A_weighted_rolling_average_BP_per_service_game"    ,  "Player_A_weighted_rolling_average_BP_saved_per_faced" ,     
-                    "Player_A_weighted_rolling_average_BP_per_return_game"    ,   "Player_A_weighted_rolling_average_BP_converted_per_created",
-                    "Player_B_weighted_rolling_average_BP_per_service_game"    ,  "Player_B_weighted_rolling_average_BP_saved_per_faced"      ,
-                    "Player_B_weighted_rolling_average_BP_per_return_game"      , "Player_B_weighted_rolling_average_BP_converted_per_created",
-                    "seeding_diff"                                              , "Weighted_RA_duration_diff"                             ,    
-                    "servadv_Player_A_Weighted_RA"                              , "servadv_Player_B_Weighted_RA"               ,               
-                    "servadv_overall_Weighted_RA"                               , "completeness_Player_A_Weighted_RA"          ,               
-                    "completeness_Player_B_Weighted_RA"                         , "BP_conversion_adv_Player_A_weighted_RA",
-                    "BP_conversion_adv_Player_B_weighted_RA"                    , "BP_conversion_adv_overall_weighted_RA"       ,              
-                    "BP_frequency_adv_Player_A_weighted_RA"                     , "BP_frequency_adv_Player_B_weighted_RA"       ,              
-                    "BP_frequency_adv_overall_weighted_RA"                      , "Player_A_weighted_rolling_average_aces_percentage" ,        
-                    "Player_A_weighted_rolling_average_dbl_fault_percentage"    , "Player_B_weighted_rolling_average_aces_percentage"  ,       
-                    "Player_B_weighted_rolling_average_dbl_fault_percentage"    , "head_to_head_record"                     )
-
-
-rownames(varImp(rf_caret_tennis_engineered_weighted)$importance)
+plot(varImp(rf_caret_tennis_engineered_weighted_bc))
 
 
