@@ -414,7 +414,7 @@ rf_caret_pred_engineered_weighted_bc <- predict(rf_caret_tennis_engineered_weigh
 rf_caref_cf_engineered_weighted_bc <- confusionMatrix(rf_caret_pred_engineered_weighted_bc, test_data$wl)
 sum(diag(rf_caref_cf_engineered_weighted_bc$table))/sum(rf_caref_cf_engineered_weighted_bc$table)
 
-dev.new()
+
 plot(rf_tennis_raw_rolled$err.rate[, 'OOB'], type = 's', xlab = 'Number of trees', ylab = 'OOB error', col = "blue4")
 lines(rf_tennis_raw_rolled_bc$err.rate[, 'OOB'], type = 's', col = "blueviolet")
 lines(rf_tennis_raw_weighted$err.rate[, 'OOB'], type = 's', col = "cyan2")
@@ -422,9 +422,8 @@ lines(rf_tennis_raw_weighted_bc$err.rate[, 'OOB'], type = 's', col = "deepskyblu
 legend("topright", legend=c("Historical Average", "Historical Average By Court", 
                             "Time Discounted Historical Average", "Time Discounted Historical Average By Court"),
        fill=c("blue4", "blueviolet", "cyan2", "deepskyblue1"))
-dev.off()
 
-dev.new()
+
 plot(rf_tennis_engineered_rolled$err.rate[, 'OOB'], type = 's', xlab = 'Number of trees', 
      ylab = 'OOB error', col = "green4", ylim = c(0.33,0.43))
 lines(rf_tennis_engineered_rolled_bc$err.rate[, 'OOB'], type = 's', col = "violetred1")
@@ -433,9 +432,17 @@ lines(rf_tennis_engineered_weighted_bc$err.rate[, 'OOB'], type = 's', col = "gol
 legend("topright", legend=c("Historical Average", "Historical Average By Court", 
                             "Time Discounted Historical Average", "Time Discounted Historical Average By Court"),
        fill=c("green4", "violetred1", "green", "goldenrod1"))
-dev.off()
 
 
+
+plot(varImp(rf_caret_tennis_raw_rolled))
+plot(varImp(rf_caret_tennis_raw_rolled_bc))
+plot(varImp(rf_caret_tennis_raw_weighted))
+plot(varImp(rf_caret_tennis_raw_weighted_bc))
+
+plot(varImp(rf_caret_tennis_engineered_rolled))
+plot(varImp(rf_caret_tennis_engineered_rolled_bc))
 plot(varImp(rf_caret_tennis_engineered_weighted))
+plot(varImp(rf_caret_tennis_engineered_weighted_bc))
 
 
