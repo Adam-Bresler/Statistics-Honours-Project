@@ -235,13 +235,13 @@ test_data_er<- engineered_rolled[-ind, ]
 
 
 mod_er <- glm(as.formula(paste(colnames(engineered_rolled)[4], "~",
-                                  paste(colnames(engineered_rolled)[c(16:41)], collapse = "+"),
+                                  paste(colnames(engineered_rolled)[c(16:39)], collapse = "+"),
                                   sep = "")), data = train_data_er, family = "binomial")
 
 summary(mod_er)
 # plot(sort(predict(mod_er, type = 'response')), type = "l")
 
-threshold_er <- 0.6066389
+threshold_er <- 0.6093746
 y.hat_er <- ifelse(predict(mod_er, newdata = test_data_er, type = 'response') > threshold_er, "Player A", "Player B") 
 
 y.hat_er <- as.factor(y.hat_er)
@@ -284,13 +284,13 @@ test_data_er_bc<- engineered_rolled_bc[-ind, ]
 
 
 mod_er_bc <- glm(as.formula(paste(colnames(engineered_rolled_bc)[4], "~",
-                               paste(colnames(engineered_rolled_bc)[c(16:41)], collapse = "+"),
+                               paste(colnames(engineered_rolled_bc)[c(16:39)], collapse = "+"),
                                sep = "")), data = train_data_er_bc, family = "binomial")
 
 summary(mod_er_bc)
 # plot(sort(predict(mod_er_bc, type = 'response')), type = "l")
 
-threshold_er_bc <- 0.5529252
+threshold_er_bc <- 0.5532467
 y.hat_er_bc <- ifelse(predict(mod_er_bc, newdata = test_data_er_bc, type = 'response') > threshold_er_bc, "Player A", "Player B") 
 
 y.hat_er_bc <- as.factor(y.hat_er_bc)
@@ -333,13 +333,13 @@ test_data_ew<- engineered_weighted[-ind, ]
 
 
 mod_ew <- glm(as.formula(paste(colnames(engineered_weighted)[4], "~",
-                                  paste(colnames(engineered_weighted)[c(16:41)], collapse = "+"),
+                                  paste(colnames(engineered_weighted)[c(16:39)], collapse = "+"),
                                   sep = "")), data = train_data_ew, family = "binomial")
 
 summary(mod_ew)
 # plot(sort(predict(mod_ew, type = 'response')), type = "l")
 
-threshold_ew <- 0.6085304
+threshold_ew <- 0.641727
 y.hat_ew <- ifelse(predict(mod_ew, newdata = test_data_ew, type = 'response') > threshold_ew, "Player A", "Player B") 
 
 y.hat_ew <- as.factor(y.hat_ew)
@@ -382,13 +382,13 @@ test_data_ew_bc<- engineered_weighted_bc[-ind, ]
 
 
 mod_ew_bc <- glm(as.formula(paste(colnames(engineered_weighted_bc)[4], "~",
-                               paste(colnames(engineered_weighted_bc)[c(16:41)], collapse = "+"),
+                               paste(colnames(engineered_weighted_bc)[c(16:39)], collapse = "+"),
                                sep = "")), data = train_data_ew_bc, family = "binomial")
 
 summary(mod_ew_bc)
 # plot(sort(predict(mod_ew_bc, type = 'response')), type = "l")
 
-threshold_ew_bc <- 0.6036258
+threshold_ew_bc <- 0.6006164
 y.hat_ew_bc <- ifelse(predict(mod_ew_bc, newdata = test_data_ew_bc, type = 'response') > threshold_ew_bc, "Player A", "Player B") 
 
 y.hat_ew_bc <- as.factor(y.hat_ew_bc)
@@ -418,7 +418,6 @@ cutoffs_ew_bc[which.max(d_ew_bc),]
 
 # ROC ------------------------------------------------------------------------
 # raw
-dev.new()
 plot(roc_rr, col = "blue4")
 plot(roc_rr_bc,add=T,col = "blueviolet")
 plot(roc_rw,add=T, col = "cyan2")
@@ -426,11 +425,10 @@ plot(roc_rw_bc,add=T, col = "deepskyblue1")
 abline(a = 0, b = 1)
 legend("bottomright", legend=c("Historical Average", "Historical Average By Court", 
                             "Time Discounted Historical Average", "Time Discounted Historical Average By Court"),
-       fill=c("blue4", "blueviolet", "cyan2", "deepskyblue1"),cex = 0.9)
-dev.off()
+       fill=c("blue4", "blueviolet", "cyan2", "deepskyblue1"))
+
 
 # engineered
-dev.new()
 plot(roc_er, col = "green4")
 plot(roc_er_bc,add=T, col = "violetred1")
 plot(roc_ew,add=T, col = "green")
@@ -438,13 +436,15 @@ plot(roc_ew_bc,add=T,col = "goldenrod1")
 abline(a = 0, b = 1)
 legend("bottomright", legend=c("Historical Average", "Historical Average By Court", 
                             "Time Discounted Historical Average", "Time Discounted Historical Average By Court"),
-       fill=c("green4", "violetred1", "green", "goldenrod1"),cex = 0.9)
-dev.off()
+       fill=c("green4", "violetred1", "green", "goldenrod1"))
+
 
 
 
 # raw weighted is best, do model building
-final_mod_rw <- stepAIC(mod_rw, direction = "backward", 
+final_mod_rw <- stepAIC(mod_rw, direction = "forward", 
                           trace = FALSE)
 xtable(summary(final_mod_rw))
 
+# confusion matrix
+xtable(conf_matrix_rw)
