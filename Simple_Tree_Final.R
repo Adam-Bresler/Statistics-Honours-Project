@@ -71,7 +71,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 tree_tennis_raw_rolled_bc <- tree(as.formula(paste(colnames(data)[4], "~",
-                                                paste(colnames(data)[c(5:6, 16:75)], collapse = "+"),
+                                                paste(colnames(data)[c(5:6, 16:71)], collapse = "+"),
                                                 sep = "")), data = train_data, split = 'deviance', 
                                control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
 
@@ -124,7 +124,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 tree_tennis_raw_weighted <- tree(as.formula(paste(colnames(data)[4], "~",
-                                                paste(colnames(data)[c(5:6, 16:75)], collapse = "+"),
+                                                paste(colnames(data)[c(5:6, 16:71)], collapse = "+"),
                                                 sep = "")), data = train_data, split = 'deviance', 
                                control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
 
@@ -175,7 +175,7 @@ test_data <- data[-ind, ]
 
 set.seed(2020)
 tree_tennis_raw_weighted_bc <- tree(as.formula(paste(colnames(data)[4], "~",
-                                                   paste(colnames(data)[c(5:6, 16:75)], collapse = "+"),
+                                                   paste(colnames(data)[c(5:6, 16:71)], collapse = "+"),
                                                    sep = "")), data = train_data, split = 'deviance', 
                                   control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
 
@@ -412,7 +412,7 @@ text(size, cv.tennis_engineered_weighted_bc$dev, substitute(leaves, list(leaves 
 best = min(cv.tennis_engineered_weighted_bc$dev)
 
 # prune the tree back:
-prune.tennis_engineered_weighted_bc <- prune.misclass(tree_tennis_engineered_weighted_bc, best = 6)
+prune.tennis_engineered_weighted_bc <- prune.misclass(tree_tennis_engineered_weighted_bc, best = 3)
 plot(prune.tennis_engineered_weighted_bc)
 text(prune.tennis_engineered_weighted_bc, pretty=0, cex=0.8)
 
