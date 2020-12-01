@@ -4,112 +4,35 @@ library(lubridate)
 library(magrittr)
 library(caret)
 library(stats)
-
-# rolling average according to court surface ---------------------------------
-
-average_past_games <- function(data, columns, months = 24){
-  n <- nrow(data)
-  player <- unique(data$name)
-  return_matrix <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
-  colnames(return_matrix) <- c(colnames(data), colnames(data)[columns])
-  
-  
-  
-  for(i in player){
-    dat <- data %>% filter(name == i)
-    player_dat <- matrix(0, nrow = 1, ncol = ncol(data) + length(columns))
-    colnames(player_dat) <- colnames(return_matrix)
-    
-    for(j in 1:nrow(dat)){ # This include all matches in a tournament, even if we are in the quarters. Thus, we need to remove the semis etc
-      matches <- dat %>% filter(dat$tournament_date <= dat$tournament_date[j] & dat$tournament_date >= (dat$tournament_date[j] - months(months)))
-      matches <- matches%>%filter(matches$tournament_surface==matches$tournament_surface[j])
-        
-      if(j == 1 | nrow(matches)<=1){ #The first game has no ytd from before
-        average <- as.data.frame(t(rep(0, length(columns))))
-        colnames(average) <- colnames(data)[columns]
-      }
-      
-      else{
-        ind <- which(matches$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
-       if (ind==1){
-         average <- as.data.frame(t(rep(0, length(columns))))
-         colnames(average) <- colnames(data)[columns]   
-       }
-      else{
-          
-        matches <- matches[1:(ind-1), ]
-        average <- matches %>% select(columns) %>% summarise_if(is.numeric, mean)
-       }
-      }
-      
-      player_dat <- rbind(player_dat, cbind(dat[j, ], average))
-    }
-    
-    return_matrix <- rbind(return_matrix, player_dat[-1, ])
-  }
-  
-  return(return_matrix[-1, ])
-}
-
-
-# rolling_average_all <- read.csv("rolling_average_all.csv")
-# rolling_average_all <- rolling_average_all[,-1]
-
-# rolling_average_court <- average_past_games(rolling_average_all, 15:56)
-
-# write.csv(rolling_average_court, file = "C:/Users/lukae/OneDrive/Documents/GitHub/Statistics-Honours-Project/rolling_average_court.csv")
-
-# rolling_average_court <- read.csv("rolling_average_court.csv")
-# rolling_average_court <- rolling_average_court[,-1]
-
+library(installr)
 
 # Head to head ---------------------------------------------------------------
 
-
-
-library(installr)
-
-
 data_H_2_H <-read.csv("BP_seperated_data_no_H2H.csv")
 data_H_2_H <- data_H_2_H[,-1]
-  
-# colnames(data_H_2_H)[c(57:98)] <- paste("rolling_average", colnames(data_H_2_H[15:56]), sep="_")
-# colnames(data_H_2_H)[c(99:140)] <- paste("rolling_average_court", colnames(data_H_2_H[15:56]), sep="_")
 
-# H_2_H <- data_H_2_H %>%
-#   group_by(Match_ID)%>%arrange(.by_group = TRUE)
-# 
-# first_player<-H_2_H[seq(1,52522,2),]
-# 
-# second_player<-H_2_H[seq(2,52522,2),]
+H_2_H <- data_H_2_H %>%
+  group_by(Match_ID)%>%arrange(.by_group = TRUE)
 
+first_player<-H_2_H[seq(1,52522,2),]
+
+second_player<-H_2_H[seq(2,52522,2),]
 
 # All previous games between any 2 players -----------------------------------
 
-
-# w_dat <- read.csv("finaldata2.csv")
-# w_dat <- w_dat[,-1]
-# w_dat <- w_dat[,c(36,39)]
-# 
-# # bring back the tournament date 
-# for (i in 1:nrow(first_player)){
-#   first_player$tournament_date[i] <- w_dat[which(w_dat$tourney_id==first_player$tourney_id[i])[1],2]
-# }
-
-
 # order data
+H_2_H$head_to_head_record <- 0
 
 H2H <-data_H_2_H %>%
   group_by(tournament_date)%>%arrange(.by_group = TRUE)
 
+# Reverse the order within the tournament 
 for (i in unique(data_H_2_H$tourney_id)){
   indices <- which(H2H$tourney_id==i)
   H2H[indices,] <- H2H[indices,]%>%arrange(desc(Match_order))
 }
 
-
 H_2_H <- H2H
-
 
 head_to_head <- function(player1, player2){
   ind <- which(H_2_H$Player_A == player1 & H_2_H$Player_B  == player2 )
@@ -121,17 +44,11 @@ head_to_head <- function(player1, player2){
     
     return(ind)
   }
-  
 }
 
 head_to_head("Roger Federer","Lloyd Harris")
 
-
-
-
 # creating head to head record -----------------------------------------------
-
-H_2_H$head_to_head_record <- 0
 
 for (i in unique(H_2_H$Player_A)){
 ind <- which(H_2_H$Player_A == i)
@@ -328,13 +245,11 @@ hard_court[indices_hard_court,c(2,3,4,477)]
 
 # combining and adding to overall data set 
 
-
 grass_H2H <- grass[,c(1,2,3,4,6,7,9,10,12,477)]
 clay_H2H <- clay[,c(1,2,3,4,6,7,9,10,12,477)]
 hard_court_H2H <- hard_court[,c(1,2,3,4,6,7,9,10,12,477)]
 
 court_H2H <- rbind.data.frame(grass_H2H,clay_H2H,hard_court_H2H)
-
 
 court_H2H <-court_H2H %>%
   group_by(tournament_date)%>%arrange(.by_group = TRUE)
@@ -345,7 +260,6 @@ court_H2H <-court_H2H %>%
 # }
 
 H_2_H$head_to_head_record_court_surface <- court_H2H$head_to_head_record_court_surface
-
 
 indices <- which(H_2_H$Player_A == "Rafael Nadal" & H_2_H$Player_B  == "Novak Djokovic" )
 

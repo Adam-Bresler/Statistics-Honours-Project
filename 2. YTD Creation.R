@@ -5,65 +5,65 @@ library(magrittr)
 library(caret)
 library(stringr)
 
-# w_dat <- read.csv("finaldata2.csv")
-# w_dat <- w_dat[, -1]
-# w_dat$tournament_date <- lubridate::as_date(w_dat$tournament_date)
-# 
-# #w_dat$first_serve_percentage <- round((w_dat$first_serves_in/w_dat$first_serves_total)*100,3)
-# # We need to convert our data to percentages
-# 
-# # Percentages ----------------------------------------------------------------
-# 
-# # serve percentages
-# w_dat$aces_percentage <- (w_dat[,7] / w_dat[,27])*100
-# w_dat$dbl_fault_percentage <- (w_dat[,8] / w_dat[,14])*100
-# w_dat$percent_first_serve_in <- (w_dat[,9] / w_dat[,10])*100
-# w_dat$percent_first_serve_won<- (w_dat[,11] / w_dat[,12])*100
-# w_dat$percent_second_serve_won<- (w_dat[,13] / w_dat[,14])*100
-# w_dat$percent_break_points_saved <- (w_dat[,15] / w_dat[,16])*100
-# 
-# # return percentages
-# w_dat$percent_first_serve_return_won <- (w_dat[,19] / w_dat[,20])*100
-# w_dat$percent_second_serve_return_won <- (w_dat[,21] / w_dat[,22])*100
-# w_dat$percent_break_points_converted <- (w_dat[,23] / w_dat[,24])*100
-# 
-# # percentage of point won
-# w_dat$percent_service_points_won <- (w_dat[,26] / w_dat[,27])*100
-# w_dat$percent_return_points_won  <- (w_dat[,28] / w_dat[,29])*100
-# w_dat$percent_total_points_won   <- (w_dat[,30] / w_dat[,31])*100
-# 
-# # replacing NaN's 
-# w_dat[which(is.na(w_dat$percent_break_points_saved)),48] <- 100
-# w_dat[which(is.na(w_dat$percent_break_points_converted)),51] <- 0
-# w_dat[which(is.na(w_dat$seed)),32] <- 34
-# 
-# w_dat$seed <- as.factor(w_dat$seed)
-# str(w_dat$seed)
-# 
-# # Matching Player Hand -------------------------------------------------------
-# 
-# players <- read.csv("players.csv")
-# players <- players[ , -1]
-# 
-# plays <- players$plays
-# plays <- strsplit(plays, ",")
-# 
-# for (i in 1:773) {
-#   players$hand[i] <- plays[[i]][1]
-#   players$back[i] <- plays[[i]][2]
-# }
-# 
-# w_dat$player_A_hand <- players$hand[match(w_dat$name, players$players)]
-# w_dat$player_B_hand <- players$hand[match(w_dat$Opponent, players$players)]
-# 
-# # Selecting Features --------------------------------------------------------
-# 
-# cols <- c(5:31, 33:35, 43:54)
-# w_dat <- w_dat[, c(1:4, 32, 36:42, 55:56, cols)]
-# 
-# #Exclude NA!
-# w_dat <- w_dat[complete.cases(w_dat[, 15:56]),]
-# data <- w_dat
+w_dat <- read.csv("finaldata2.csv")
+w_dat <- w_dat[, -1]
+w_dat$tournament_date <- lubridate::as_date(w_dat$tournament_date)
+
+# Percentages ----------------------------------------------------------------
+# We need to convert our data to percentages
+
+# serving percentages
+w_dat$aces_percentage <- (w_dat[,7] / w_dat[,27])*100
+w_dat$dbl_fault_percentage <- (w_dat[,8] / w_dat[,14])*100
+w_dat$percent_first_serve_in <- (w_dat[,9] / w_dat[,10])*100
+w_dat$percent_first_serve_won<- (w_dat[,11] / w_dat[,12])*100
+w_dat$percent_second_serve_won<- (w_dat[,13] / w_dat[,14])*100
+w_dat$percent_break_points_saved <- (w_dat[,15] / w_dat[,16])*100
+
+# returning percentages
+w_dat$percent_first_serve_return_won <- (w_dat[,19] / w_dat[,20])*100
+w_dat$percent_second_serve_return_won <- (w_dat[,21] / w_dat[,22])*100
+w_dat$percent_break_points_converted <- (w_dat[,23] / w_dat[,24])*100
+
+# percentage of point won
+w_dat$percent_service_points_won <- (w_dat[,26] / w_dat[,27])*100
+w_dat$percent_return_points_won  <- (w_dat[,28] / w_dat[,29])*100
+w_dat$percent_total_points_won   <- (w_dat[,30] / w_dat[,31])*100
+
+# replacing NaN's
+w_dat[which(is.na(w_dat$percent_break_points_saved)),48] <- 100
+w_dat[which(is.na(w_dat$percent_break_points_converted)),51] <- 0
+w_dat[which(is.na(w_dat$seed)),32] <- 34
+
+w_dat$seed <- as.factor(w_dat$seed)
+str(w_dat$seed)
+
+# Adding in Player Hand -------------------------------------------------------
+
+players <- read.csv("players.csv")
+players <- players[ , -1]
+
+plays <- players$plays
+plays <- strsplit(plays, ",")
+
+for (i in 1:773) {
+  players$hand[i] <- plays[[i]][1]
+  players$back[i] <- plays[[i]][2]
+}
+
+w_dat$player_A_hand <- players$hand[match(w_dat$name, players$players)]
+w_dat$player_B_hand <- players$hand[match(w_dat$Opponent, players$players)]
+
+# Selecting Features to roll -------------------------------------------------
+
+cols <- c(5:31, 33:35, 43:54)
+w_dat <- w_dat[, c(1:4, 32, 36:42, 55:56, cols)]
+
+#Exclude NA!
+w_dat <- w_dat[complete.cases(w_dat[, 15:56]),]
+data <- w_dat
+
+# Rolling Average Function
 
 rolling_average <- function(data, columns, months = 24){
   n <- nrow(data)
@@ -87,7 +87,7 @@ rolling_average <- function(data, columns, months = 24){
       }
 
       else{
-      ind <- which(matches$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
+      ind <- which(matches$Match_ID == dat$Match_ID[j])  #Find which j match in the tournament we are at, and throw newer stuff away
       matches <- matches[1:(ind-1), ]
       average <- matches %>% select(columns) %>% summarise_if(is.numeric, mean)
       }
@@ -100,6 +100,8 @@ rolling_average <- function(data, columns, months = 24){
 
   return(return_matrix[-1, ])
 }
+
+# Run these lines to actually create the data
 
 #data <- rolling_average(data, 15:56, 24)
 #colnames(data)[c(57:98)] <- paste("rolling_average", colnames(data[15:56]), sep="_")
@@ -121,7 +123,7 @@ rolling_average_by_court <- function(data, columns, months = 24){
     
     for(j in 1:nrow(dat)){ # This include all matches in a tournament, even if we are in the quarters. Thus, we need to remove the semis etc
       matches <- dat %>% filter(dat$tournament_date <= dat$tournament_date[j] & dat$tournament_date >= (dat$tournament_date[j] %m-% months(months)))
-      matches <- matches%>%filter(matches$tournament_surface==matches$tournament_surface[j])
+      matches <- matches%>%filter(matches$tournament_surface==matches$tournament_surface[j]) # Court surface check
       
       if(j == 1 | nrow(matches)<=1){ #The first game has no ytd from before
         average <- as.data.frame(t(rep(0, length(columns))))
@@ -129,7 +131,7 @@ rolling_average_by_court <- function(data, columns, months = 24){
       }
       
       else{
-        ind <- which(matches$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
+        ind <- which(matches$Match_ID == dat$Match_ID[j])  #Find which j match in the tournament we are at, and throw newer stuff away
         if (ind==1){
           average <- as.data.frame(t(rep(0, length(columns))))
           colnames(average) <- colnames(data)[columns]   
@@ -148,6 +150,8 @@ rolling_average_by_court <- function(data, columns, months = 24){
   
   return(return_matrix[-1, ])
 }
+
+# Run these to create data
 
 #data <- rolling_average_by_court(data, 15:56, 24)
 #colnames(data)[c(99:140)] <- paste("rolling_average_by_court", colnames(data[15:56]), sep="_")
@@ -185,7 +189,7 @@ weighted_rolling_average <- function(data, columns){
             average_6 <- average_initial
           }
           else{
-            ind6 <- which(matches_6_months$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
+            ind6 <- which(matches_6_months$Match_ID == dat$Match_ID[j])  #Find which j match in the tournament we are at, and throw newer stuff away
             matches_6_months <- matches_6_months[1:(ind6-1), ]
             average_6 <- matches_6_months %>% select(columns) %>% summarise_if(is.numeric, mean)
           }
@@ -212,6 +216,8 @@ weighted_rolling_average <- function(data, columns){
           }
         }
       
+      # Data now is worth double the next most recent data
+      # This is not a good way to do it. However, for the way we did the rolling average (badly) it makes the most sense  
       if(nrow(matches_6_months) >= 1 & nrow(matches_12_months) >= 1 & nrow(matches_24_months) >= 1 & nrow(matches_all_after_24) >= 1){
         weights <- c(8,4,2,1)
         sum <- 15
@@ -293,6 +299,8 @@ weighted_rolling_average <- function(data, columns){
   return(return_matrix[-1, ])
 }
 
+# Run these to actually create the data
+
 #data <- weighted_rolling_average(data, 15:56)
 #colnames(data)[c(141:182)] <- paste("weighted_rolling_average", colnames(data[15:56]), sep="_")
 
@@ -336,7 +344,7 @@ weighted_rolling_average_by_court <- function(data, columns){
           average_6 <- average_initial
         }
         else{
-          ind6 <- which(matches_6_months$Match_ID == dat$Match_ID[j])  #Find which j we are in matches, and throw older stuff away
+          ind6 <- which(matches_6_months$Match_ID == dat$Match_ID[j])  #Find which j match in the tournament we are at, and throw newer stuff away
           if(ind6 == 1){
             average_6 <- average_initial
           }
@@ -459,19 +467,15 @@ weighted_rolling_average_by_court <- function(data, columns){
 #write.csv(data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/final_rolled_weighted_court.csv")
 
 # Add in new features --------------------------------------------------------
+# It would be better to create these then roll the full data set,
+# However, as this feature was created it was more efficient to add after
+
 data <- read.csv("final_rolled_weighted_court.csv")
 data <- data[,-1]
 data$tournament_date <- lubridate::as_date(data$tournament_date)
 
 data <- data[-which(data$service_games_played == 0),]
 data <- data[-which(data$return_games_played == 0),]
-
-#data$break_points_serve_total_adjusted <- ifelse(data$break_points_serve_total == 0, 0.5, data$break_points_serve_total)
-#data$break_point_serve_feature <- (exp(data[,25])/exp(data[,26]))*(data[,27]/data[,225])
-
-#data$break_points_return_total_adjusted <- ifelse(data$break_points_return_total == 0, 0.1, data$break_points_return_total)
-#data$break_point_return_feature <- (exp(data[,33])/exp(data[,34]))*(data[,227]/data[,35]) # But actually this is inverted!
-# WE want consistency so both must have high as good
 
 data$BP_per_service_game  <- data[,26]/data[,27]
 data$BP_saved_per_faced   <- data[,25]/data[,26]
@@ -491,5 +495,5 @@ colnames(data)[c(237:240)] <- paste("weighted_rolling_average", colnames(data)[c
 data <- weighted_rolling_average_by_court(data, c(225:228))
 colnames(data)[c(241:244)] <- paste("weighted_by_court", colnames(data)[c(225:228)], sep="_")
 
-write.csv(data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/BP_serve_and_return_seperated.csv")
+#write.csv(data, file = "C:/Users/Adam Bresler/Documents/GitHub/Statistics-Honours-Project/Data/BP_serve_and_return_seperated.csv")
 

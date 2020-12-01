@@ -150,10 +150,10 @@ colnames(features)[73:88] <- colnames(data)[c(85, 86, 127, 128, 169, 170, 211, 2
 
 
 # save features in a csv file
-write.csv(features, file = "C:/Users/bresl/Documents/GitHub/Statistics-Honours-Project/Data/features_no_H2H.csv")
+#write.csv(features, file = "C:/Users/bresl/Documents/GitHub/Statistics-Honours-Project/Data/features_no_H2H.csv")
 
 
-# Head to head ---------------------------------------------------------------
+# Head to head to feature set ------------------------------------------------
 features_h2h <- read.csv("features_no_H2H.csv")
 features_h2h <- features_h2h[,-1]
 
