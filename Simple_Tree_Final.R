@@ -22,7 +22,7 @@ set.seed(2020)
 tree_tennis_raw_rolled <- tree(as.formula(paste(colnames(data)[4], "~",
                                     paste(colnames(data)[c(5:6, 16:71)], collapse = "+"),
                                     sep = "")), data = train_data, split = 'deviance', 
-                   control = tree.control(nobs=23656, mincut = 2, minsize = 4, mindev = 0.001))
+                   control = tree.control(nobs=23656, mincut = 1, minsize = 2, mindev = 0.001))
 
 summary(tree_tennis_raw_rolled) 
 tree_tennis_raw_rolled
@@ -35,7 +35,7 @@ yhat_data <- predict(tree_tennis_raw_rolled,  test_data, type = 'class')
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-# Prune that tree---------------------------------------
+# Prune ---------------------------------------
 cv.tennis_raw_rolled <- cv.tree(tree_tennis_raw_rolled, FUN=prune.misclass)
 
 size <- cv.tennis_raw_rolled$size
@@ -86,7 +86,7 @@ yhat_data <- predict(tree_tennis_raw_rolled_bc,  test_data, type = 'class')
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-# Prune that tree---------------------------------------
+# Prune ---------------------------------------
 cv.tennis_raw_rolled_bc <- cv.tree(tree_tennis_raw_rolled_bc, FUN=prune.misclass)
 
 size <- cv.tennis_raw_rolled_bc$size
@@ -108,8 +108,6 @@ text(prune.tennis_raw_rolled_bc, pretty=0, cex=0.8)
 tree.pred_raw_rolled_bc <- predict(prune.tennis_raw_rolled_bc, test_data, type='class')
 table(tree.pred_raw_rolled_bc, test_data$wl)
 sum(diag(table(tree.pred_raw_rolled_bc, test_data$wl)))/length(test_data$wl)*100
-
-
 
 #Raw weighted ------------------------------------
 data <- read.csv("raw_weighted.csv")
@@ -139,7 +137,7 @@ yhat_data <- predict(tree_tennis_raw_weighted,  test_data, type = 'class')
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-# Prune that tree---------------------------------------
+# Prune ---------------------------------------
 cv.tennis_raw_weighted <- cv.tree(tree_tennis_raw_weighted, FUN=prune.misclass)
 
 size <- cv.tennis_raw_weighted$size
@@ -182,7 +180,7 @@ tree_tennis_raw_weighted_bc <- tree(as.formula(paste(colnames(data)[4], "~",
 summary(tree_tennis_raw_weighted_bc) 
 tree_tennis_raw_weighted_bc
 plot(tree_tennis_raw_weighted_bc)
-text(tree_tennis_raw_weighted_bc, cex = 0.9)
+text(tree_tennis_raw_weighted_bc, cex = 0.75)
 
 yhat_data <- predict(tree_tennis_raw_weighted_bc,  test_data, type = 'class')
 
@@ -190,7 +188,7 @@ yhat_data <- predict(tree_tennis_raw_weighted_bc,  test_data, type = 'class')
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-# Prune that tree---------------------------------------
+# Prune ---------------------------------------
 cv.tennis_raw_weighted_bc <- cv.tree(tree_tennis_raw_weighted_bc, FUN=prune.misclass)
 
 size <- cv.tennis_raw_weighted_bc$size
@@ -243,7 +241,7 @@ yhat_data <- predict(tree_tennis_engineered_rolled,  test_data, type = 'class')
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-# Prune that tree---------------------------------------
+# Prune ---------------------------------------
 cv.tennis_engineered_rolled <- cv.tree(tree_tennis_engineered_rolled, FUN=prune.misclass)
 
 size <- cv.tennis_engineered_rolled$size
@@ -294,7 +292,7 @@ yhat_data <- predict(tree_tennis_engineered_rolled_bc,  test_data, type = 'class
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-# Prune that tree---------------------------------------
+# Prune ---------------------------------------
 cv.tennis_engineered_rolled_bc <- cv.tree(tree_tennis_engineered_rolled_bc, FUN=prune.misclass)
 
 size <- cv.tennis_engineered_rolled_bc$size
@@ -347,7 +345,7 @@ yhat_data <- predict(tree_tennis_engineered_weighted,  test_data, type = 'class'
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-# Prune that tree---------------------------------------
+# Prune ---------------------------------------
 cv.tennis_engineered_weighted <- cv.tree(tree_tennis_engineered_weighted, FUN=prune.misclass)
 
 size <- cv.tennis_engineered_weighted$size
@@ -398,7 +396,7 @@ yhat_data <- predict(tree_tennis_engineered_weighted_bc,  test_data, type = 'cla
 sum(diag(c_mat))/nrow(test_data)*100                
 1 - sum(diag(c_mat))/nrow(test_data)
 
-# Prune that tree---------------------------------------
+# Prune  ----------------------------------------
 cv.tennis_engineered_weighted_bc <- cv.tree(tree_tennis_engineered_weighted_bc, FUN=prune.misclass)
 
 size <- cv.tennis_engineered_weighted_bc$size
@@ -421,15 +419,3 @@ tree.pred_engineered_weighted_bc <- predict(prune.tennis_engineered_weighted_bc,
 table(tree.pred_engineered_weighted_bc, test_data$wl)
 sum(diag(table(tree.pred_engineered_weighted_bc, test_data$wl)))/length(test_data$wl)*100
 
-
-
-
-
-
-
-
-
-
-
-
-#loadhistory("Chapter3.Rhistory")
