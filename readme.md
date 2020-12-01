@@ -25,4 +25,13 @@ The R code used is split into 10 files.
 10. Gradient Boosting Final
 - Fitting and getting predictions from gradient boosting.
 
-Files 7-10 are the finals models and use the data created in files 1-6. They can be run using the csv files, the 8 created by the file dividing the datasets.   
+Files 7-10 are the final models and use the data created in files 1-6. They can be run using the csv files created by 6. Dividing the Datasets. These are:
+
+raw_rolled \
+raw_rolled_bc \
+raw_weighted \
+raw_weighted_bc   
+engineered_rolled \
+engineered_rolled_bc \
+engineered_weighted \
+engineered_weighted_bc  
